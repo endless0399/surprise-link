@@ -3,57 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>For Poorvi ❤️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         :root { --pink: #ff4081; --bg: #ffebee; }
+        
+        /* touch-action: manipulation prevents the double-tap zoom delay */
+        * { 
+            touch-action: manipulation; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+
         body { 
             margin: 0; background: var(--bg); 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            overflow: hidden;
+            overflow: hidden; 
         }
+
         .card { 
-            background: white; padding: 30px; border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 400px; text-align: center;
+            background: white; padding: 25px; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 320px; text-align: center;
             z-index: 10;
         }
+
         .hidden { display: none; }
-        h1 { color: #d32f2f; margin-bottom: 10px; }
-        p { color: #555; line-height: 1.5; }
+        h1 { color: #d32f2f; margin-bottom: 10px; font-size: 1.4rem; }
         
-        /* Level 1: Simple Maze */
-        #maze-area { 
-            position: relative; width: 320px; height: 150px; background: var(--pink); 
-            margin: 20px auto; border-radius: 15px; overflow: hidden; cursor: crosshair;
-        }
-        .path { 
-            position: absolute; background: white; 
-            top: 40px; left: 0; width: 320px; height: 70px; 
-            z-index: 1; 
-        }
-        #player { position: absolute; top: 60px; left: 10px; font-size: 30px; z-index: 10; pointer-events: none; }
+        /* Level 1: Tap Maze */
+        #maze-area { position: relative; width: 300px; height: 150px; background: var(--pink); margin: 20px auto; border-radius: 15px; overflow: hidden; }
+        .path { position: absolute; background: white; top: 40px; left: 0; width: 300px; height: 70px; z-index: 1; }
+        #player { position: absolute; top: 60px; left: 10px; font-size: 30px; z-index: 10; transition: all 0.2s ease; }
         #goal { position: absolute; top: 55px; right: 10px; font-size: 35px; z-index: 2; }
 
         /* Level 3: Love Meter */
-        .bar-container { width: 100%; height: 30px; background: #eee; border-radius: 15px; margin: 20px 0; overflow: hidden; border: 2px solid #f8bbd0; }
+        .bar-container { width: 100%; height: 25px; background: #eee; border-radius: 15px; margin: 20px 0; overflow: hidden; border: 2px solid #f8bbd0; }
         #fill { width: 0%; height: 100%; background: var(--pink); transition: width 0.1s linear; }
-        #heart-btn { font-size: 5rem; cursor: pointer; user-select: none; transition: transform 0.1s; display: inline-block; }
-        #heart-btn:active { transform: scale(1.2); }
+        #heart-btn { font-size: 4.5rem; cursor: pointer; user-select: none; display: inline-block; }
 
-        /* Level 4: Catching Game */
-        #game-screen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #ff80ab; display: none; flex-direction: column; align-items: center; z-index: 1000;
-        }
-        #bucket { position: absolute; bottom: 50px; font-size: 5rem; pointer-events: none; }
+        /* Catch Game */
+        #game-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ff80ab; display: none; flex-direction: column; align-items: center; z-index: 1000; }
+        #bucket { position: absolute; bottom: 50px; font-size: 5rem; transition: left 0.15s ease-out; }
         .kiss { position: absolute; font-size: 2.5rem; }
 
-        /* Buttons & Images */
-        button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: none; background: var(--pink); color: white; font-weight: bold; cursor: pointer; }
-        .btn-opt { background: #fce4ec; color: #d81b60; border: 1px solid #f8bbd0; margin-bottom: 5px; }
-        .couple-img { width: 100%; max-height: 350px; object-fit: cover; border-radius: 15px; border: 4px solid var(--pink); margin-bottom: 15px; }
+        /* Scratch Card */
+        #scratch-container { position: relative; width: 280px; height: 280px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: 4px solid var(--pink); }
+        #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 20; touch-action: none; }
+        .couple-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
+
+        button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: none; background: var(--pink); color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-opt { background: #fce4ec; color: #d81b60; border: 1px solid #f8bbd0; margin-bottom: 8px; font-size: 0.9rem; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div id="lvl0" class="card">
         <h1>Hi Poorvi! ❤️</h1>
@@ -63,8 +64,8 @@
 
     <div id="lvl1" class="card hidden">
         <h1>Challenge 1: The Path</h1>
-        <p>Drag the runner 🏃‍♀️ across the white path to reach Siddharth!</p>
-        <div id="maze-area">
+        <p>Tap the white path to move 🏃‍♀️ to Siddharth!</p>
+        <div id="maze-area" onclick="handleMazeTap(event)">
             <div class="path"></div>
             <div id="player">🏃‍♀️</div>
             <div id="goal">🙋‍♂️</div>
@@ -73,67 +74,74 @@
 
     <div id="lvl2" class="card hidden">
         <h1>Challenge 2: Memory</h1>
-        <p id="qText" style="font-weight:bold; padding: 10px;"></p>
+        <p id="qText" style="font-weight:bold; padding: 5px;"></p>
         <div id="qOpts"></div>
     </div>
 
     <div id="lvl3" class="card hidden">
         <h1>Challenge 3: Love Meter</h1>
-        <p>Click the heart fast! Don't let the love drop!</p>
+        <p>Tap ❤️ fast! Don't let it drop!</p>
         <div id="heart-btn" onclick="tapHeart()">❤️</div>
         <div class="bar-container"><div id="fill"></div></div>
     </div>
 
-    <div id="game-screen">
-        <h1 style="color:white; margin-top: 50px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); text-align: center;">
-            Catch 5 kisses from Siddharth!<br>Score: <span id="score">0</span>
+    <div id="game-screen" onclick="moveBucket(event)">
+        <h1 style="color:white; margin-top: 50px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); text-align: center; padding: 0 10px;">
+            Tap to catch 5 kisses!<br>Score: <span id="score">0</span>
         </h1>
-        <div id="bucket">🧺</div>
+        <div id="bucket" style="left: 50%;">🧺</div>
     </div>
 
     <div id="lvl5" class="card hidden">
-        <img src="our-photo.jpeg" alt="Siddharth and Poorvi" class="couple-img">
-        <h2 style="color:var(--pink); margin: 0;">It's a Date!</h2>
-        <p style="font-weight:bold; color:#d32f2f; font-size: 1.1rem; margin-top: 10px; line-height: 1.4;">
+        <h2 style="color:var(--pink); margin-bottom: 10px;">Happy Valentine's Week! 🌹✨</h2>
+        <div id="scratch-container">
+            <img src="our-photo.jpeg" class="couple-img">
+            <canvas id="scratch-canvas" width="280" height="280"></canvas>
+        </div>
+        <p style="font-weight:bold; color:#d32f2f; margin-top: 15px; font-size: 1.1rem;">
             Looks like Poorvi loves Siddharth a lot 💋😘❤️
         </p>
-        <p style="color:#555; font-style: italic; font-size: 0.95rem;">
-            Siddharth is very happy to have Poorvi ❤️
+        <p style="color:#555; font-style: italic; font-size: 0.9rem;">
+            Siddharth is very happy to have Poorvi ❤️🥳
         </p>
     </div>
 
     <script>
-        let luv = 0;
-        let luvInterval;
+        // Disable Double-Tap Zoom for iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            let now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        let luv = 0, luvInterval, step = 0, score = 0;
 
         function go(n) {
             document.querySelectorAll('.card, #game-screen').forEach(el => el.style.display = 'none');
             const target = (n === 4) ? document.getElementById('game-screen') : document.getElementById('lvl' + n);
             if (n === 4) target.style.display = 'flex'; else target.style.display = 'block';
-            
             if(n === 2) loadQ();
             if(n === 3) startLuvDrain();
             if(n === 4) initCatch();
+            if(n === 5) initScratch();
         }
 
-        // MAZE LOGIC
-        const player = document.getElementById('player');
-        const maze = document.getElementById('maze-area');
-        maze.onmousemove = (e) => {
-            if (document.getElementById('lvl1').style.display === 'none') return;
-            const rect = maze.getBoundingClientRect();
-            const y = e.clientY - rect.top;
+        function handleMazeTap(e) {
+            const rect = document.getElementById('maze-area').getBoundingClientRect();
             const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const player = document.getElementById('player');
             if (y < 40 || y > 110) {
-                player.style.left = "10px"; player.style.top = "60px";
+                player.style.left = "10px";
             } else {
-                player.style.left = (x - 15) + "px"; player.style.top = (y - 15) + "px";
-                if (x > 280) go(2);
+                player.style.left = (x - 15) + "px";
+                if (x > 260) go(2);
             }
-        };
+        }
 
-        // QUIZ LOGIC
-        let step = 0;
         const qs = [
             { q: "Poorvi, where did we meet first?", o: ["Park 🌳", "Hospital 🏥", "School 🏫"], a: "Hospital 🏥" },
             { q: "What was the first gift Siddharth gave you?", o: ["Teddy Bear 🧸", "Octopus 🐙", "Chocolates 🍫", "Flowers 💐"], a: "Octopus 🐙" },
@@ -142,56 +150,58 @@
         ];
 
         function loadQ() {
-            const data = qs[step];
-            document.getElementById('qText').innerText = data.q;
-            const div = document.getElementById('qOpts');
-            div.innerHTML = '';
+            const data = qs[step]; document.getElementById('qText').innerText = data.q;
+            const div = document.getElementById('qOpts'); div.innerHTML = '';
             data.o.forEach(opt => {
-                const b = document.createElement('button');
-                b.innerText = opt; b.className = 'btn-opt';
-                b.onclick = () => { 
-                    if(!data.a || opt === data.a) {
-                        step++; if(step < qs.length) loadQ(); else go(3); 
-                    } else { alert("Try again, sweetheart ❤️"); }
-                };
+                const b = document.createElement('button'); b.innerText = opt; b.className = 'btn-opt';
+                b.onclick = () => { if(!data.a || opt === data.a) { step++; if(step < qs.length) loadQ(); else go(3); } else { alert("Try again, sweetheart ❤️"); } };
                 div.appendChild(b);
             });
         }
 
-        // LOVE METER logic
-        function startLuvDrain() {
-            luvInterval = setInterval(() => { if (luv > 0) { luv -= 1.8; updateBar(); } }, 100);
-        }
-        function tapHeart() {
-            luv += 12;
-            if (luv >= 100) { luv = 100; updateBar(); clearInterval(luvInterval); setTimeout(() => go(4), 300); }
-            updateBar();
-        }
+        function startLuvDrain() { luvInterval = setInterval(() => { if (luv > 0) { luv -= 1.8; updateBar(); } }, 100); }
+        function tapHeart() { luv += 12; if (luv >= 100) { luv = 100; updateBar(); clearInterval(luvInterval); setTimeout(() => go(4), 300); } updateBar(); }
         function updateBar() { document.getElementById('fill').style.width = luv + '%'; }
 
-        // CATCHING GAME logic
-        let score = 0;
+        function moveBucket(e) {
+            const bucket = document.getElementById('bucket');
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            bucket.style.left = x + 'px';
+            bucket.style.transform = 'translateX(-50%)';
+        }
+
         function initCatch() {
-            const b = document.getElementById('bucket');
-            window.onmousemove = (e) => { b.style.left = e.clientX + 'px'; b.style.transform = 'translateX(-50%)'; };
             const gameInt = setInterval(() => {
                 if(score >= 5) { clearInterval(gameInt); go(5); return; }
-                const k = document.createElement('div');
-                k.className = 'kiss'; k.innerHTML = '💋';
-                k.style.left = Math.random() * (window.innerWidth - 40) + 'px';
-                k.style.top = '-50px';
+                const k = document.createElement('div'); k.className = 'kiss'; k.innerHTML = '💋';
+                k.style.left = Math.random() * (window.innerWidth - 40) + 'px'; k.style.top = '-50px';
                 document.getElementById('game-screen').appendChild(k);
                 let y = -50;
                 const fall = setInterval(() => {
                     y += 6; k.style.top = y + 'px';
-                    const br = b.getBoundingClientRect(), kr = k.getBoundingClientRect();
-                    if(kr.bottom >= br.top && kr.right >= br.left && kr.left <= br.right) {
-                        score++; document.getElementById('score').innerText = score;
-                        clearInterval(fall); k.remove();
-                    }
+                    const br = document.getElementById('bucket').getBoundingClientRect(), kr = k.getBoundingClientRect();
+                    if(kr.bottom >= br.top && kr.right >= br.left && kr.left <= br.right) { score++; document.getElementById('score').innerText = score; clearInterval(fall); k.remove(); }
                     if(y > window.innerHeight) { clearInterval(fall); k.remove(); }
                 }, 20);
             }, 900);
+        }
+
+        function initScratch() {
+            const canvas = document.getElementById('scratch-canvas'); const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#C0C0C0'; ctx.fillRect(0, 0, 280, 280);
+            ctx.fillStyle = '#666'; ctx.font = '16px Arial'; ctx.textAlign = 'center'; ctx.fillText('Tap & rub to reveal ❤️', 140, 140);
+            let isDrawing = false;
+            const scratch = (e) => {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+                ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(x, y, 25, 0, Math.PI * 2); ctx.fill();
+            };
+            canvas.addEventListener('mousedown', () => isDrawing = true); canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('mousemove', scratch);
+            canvas.addEventListener('touchstart', (e) => { isDrawing = true; }); canvas.addEventListener('touchend', () => isDrawing = false);
+            canvas.addEventListener('touchmove', (e) => scratch(e));
         }
     </script>
 </body>
