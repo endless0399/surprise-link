@@ -2,171 +2,134 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>For Poorvi ❤️</title>
     <style>
-        :root { --pink: #ff4081; --bg: #ffebee; --path: #ffffff; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --pink: #ff4081; --bg: #ffebee; }
         body { 
-            margin: 0; padding: 20px; background: var(--bg); 
-            font-family: -apple-system, sans-serif; text-align: center; 
+            margin: 0; background: var(--bg); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            overflow: hidden; touch-action: none;
         }
         .card { 
-            background: white; padding: 25px 20px; border-radius: 25px; 
-            box-shadow: 0 10px 25px rgba(255, 64, 129, 0.2); width: 100%; max-width: 350px; 
-            z-index: 10;
+            background: white; padding: 30px; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 400px; text-align: center;
         }
-        .hidden { display: none !important; }
-        h1 { color: #d32f2f; font-size: 1.5rem; margin-bottom: 5px; }
-        p { color: #555; font-size: 1rem; line-height: 1.4; }
+        .hidden { display: none; }
+        h1 { color: #d32f2f; }
         
-        /* Level 1: Path Maze */
-        #maze-container { 
+        /* The Maze Path */
+        #maze-area { 
             position: relative; width: 300px; height: 300px; background: var(--pink); 
-            margin: 15px auto; border: 5px solid var(--pink); border-radius: 20px; touch-action: none; overflow: hidden;
+            margin: 20px auto; border-radius: 10px; overflow: hidden;
         }
-        .path-segment { position: absolute; background: var(--path); z-index: 1; }
-        #p-icon { position: absolute; top: 5px; left: 10px; font-size: 28px; z-index: 100; pointer-events: none; }
-        #s-icon { position: absolute; bottom: 5px; right: 10px; font-size: 30px; z-index: 2; }
+        .path { position: absolute; background: white; }
+        #player { 
+            position: absolute; top: 10px; left: 10px; font-size: 25px; 
+            cursor: pointer; z-index: 10; transition: transform 0.1s;
+        }
+        #goal { position: absolute; bottom: 10px; right: 10px; font-size: 30px; }
 
-        /* General UI */
-        button { width: 100%; padding: 14px; margin-top: 10px; font-size: 1rem; font-weight: bold; border-radius: 15px; border: none; cursor: pointer; }
-        .btn-main { background: var(--pink); color: white; }
-        .btn-opt { background: #fce4ec; color: #d81b60; border: 1px solid #f8bbd0; margin-bottom: 8px; }
-        .bar { width: 100%; height: 25px; background: #eee; border-radius: 15px; margin: 15px 0; overflow: hidden; }
-        #fill { width: 0%; height: 100%; background: var(--pink); transition: width 0.2s; }
-
-        /* Catching Game Area */
+        /* Buttons & UI */
+        button { 
+            width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; 
+            border: none; background: var(--pink); color: white; 
+            font-weight: bold; cursor: pointer; font-size: 1rem;
+        }
+        button:hover { opacity: 0.9; }
+        .btn-opt { background: #fce4ec; color: #d81b60; border: 1px solid #f8bbd0; }
+        
+        /* Game Area */
         #game-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(#ffc1e3, #ff80ab); 
-            display: none; z-index: 1000; touch-action: none; 
+            background: #ff80ab; display: none; flex-direction: column; align-items: center;
         }
-        #bucket { position: absolute; bottom: 100px; left: 50%; font-size: 5.5rem; transform: translateX(-50%); pointer-events: none; z-index: 1001; }
-        .kiss { position: absolute; font-size: 3rem; z-index: 1002; }
-
-        /* Final Reveal Image */
-        .couple-photo { width: 100%; border-radius: 15px; margin-bottom: 15px; border: 3px solid var(--pink); }
-
-        /* Scratch Reveal */
-        #canvas-wrap { position: relative; width: 280px; height: 280px; margin: 0 auto; }
-        canvas { position: absolute; top: 0; left: 0; z-index: 2; border-radius: 20px; touch-action: none; }
-        .reveal { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: white; border-radius: 20px; z-index: 1; padding: 10px;
-        }
-        .timer { display: flex; gap: 5px; margin-top: 5px; }
-        .box { background: var(--pink); color: white; padding: 6px; border-radius: 8px; font-size: 0.7rem; min-width: 45px; }
+        #bucket { position: absolute; bottom: 50px; font-size: 5rem; transition: left 0.1s; }
+        .kiss { position: absolute; font-size: 2.5rem; }
     </style>
 </head>
 <body>
 
     <div id="lvl0" class="card">
-        <div style="font-size: 4rem;">🎁</div>
         <h1>Hi Poorvi! ❤️</h1>
-        <p>Siddharth has a special quest for you. Ready to start?</p>
-        <button class="btn-main" onclick="go(1)">Start Quest</button>
+        <p>Siddharth has a little quest for you. Reach the end to see the surprise!</p>
+        <button onclick="go(1)">Start Game</button>
     </div>
 
     <div id="lvl1" class="card hidden">
         <h1>Challenge 1: The Path</h1>
-        <p>Stay on the white path to reach Siddharth!</p>
-        <div id="maze-container">
-            <div class="path-segment" style="top: 0; left: 0; width: 60px; height: 100px;"></div>
-            <div class="path-segment" style="top: 60px; left: 0; width: 240px; height: 40px;"></div>
-            <div class="path-segment" style="top: 60px; left: 200px; width: 40px; height: 120px;"></div>
-            <div class="path-segment" style="top: 140px; left: 60px; width: 180px; height: 40px;"></div>
-            <div class="path-segment" style="top: 140px; left: 60px; width: 40px; height: 120px;"></div>
-            <div class="path-segment" style="top: 220px; left: 60px; width: 240px; height: 40px;"></div>
-            <div class="path-segment" style="top: 220px; left: 240px; width: 60px; height: 80px;"></div>
-            <div id="p-icon">🏃‍♀️</div>
-            <div id="s-icon">🙋‍♂️</div>
+        <p>Drag the runner 🏃‍♀️ along the white path to reach Siddharth! If you touch the pink, you restart.</p>
+        <div id="maze-area" onmouseleave="resetPlayer()">
+            <div class="path" style="top:0; left:0; width:60px; height:100px;"></div>
+            <div class="path" style="top:60px; left:0; width:250px; height:40px;"></div>
+            <div class="path" style="top:60px; left:210px; width:40px; height:150px;"></div>
+            <div class="path" style="top:170px; left:50px; width:200px; height:40px;"></div>
+            <div class="path" style="top:170px; left:50px; width:40px; height:130px;"></div>
+            <div class="path" style="top:260px; left:50px; width:250px; height:40px;"></div>
+            
+            <div id="player" draggable="true">🏃‍♀️</div>
+            <div id="goal">🙋‍♂️</div>
         </div>
     </div>
 
     <div id="lvl2" class="card hidden">
         <h1>Challenge 2: Memory</h1>
-        <p id="qText" style="font-weight: bold; padding: 10px;"></p>
+        <p id="qText" style="font-weight:bold;"></p>
         <div id="qOpts"></div>
     </div>
 
-    <div id="lvl3" class="card hidden">
-        <h1>Challenge 3: Love Meter</h1>
-        <p>Tap the heart to charge Siddharth's love!</p>
-        <div style="font-size:6rem; cursor:pointer; margin: 20px 0;" onclick="tap()">❤️</div>
-        <div class="bar"><div id="fill"></div></div>
-    </div>
-
     <div id="game-screen">
-        <div style="color:white; font-weight:bold; padding-top:60px; font-size: 1.4rem;">
-            Poorvi, catch Siddharth's Kisses!<br>
-            Score: <span id="score">0</span> / 10
-        </div>
+        <h1 style="color:white;">Catch 10 Kisses! Score: <span id="score">0</span></h1>
         <div id="bucket">🧺</div>
     </div>
 
     <div id="lvl5" class="card hidden">
-        <h1>The Final Surprise ❤️</h1>
-        <div id="canvas-wrap">
-            <div class="reveal">
-                <img src="our-photo.jpeg" class="couple-photo" alt="Us">
-                <h2 style="color:var(--pink); margin: 0; font-size: 1.2rem;">It's a Date!</h2>
-                <div class="timer">
-                    <div class="box"><span id="d">0</span><br>D</div>
-                    <div class="box"><span id="h">0</span><br>H</div>
-                    <div class="box"><span id="m">0</span><br>M</div>
-                    <div class="box"><span id="s">0</span><br>S</div>
-                </div>
-                <p style="font-weight:bold; margin-top: 10px; color: #d32f2f; font-size: 0.9rem;">Looks like you love me a lot!<br>— Siddharth</p>
-            </div>
-            <canvas id="canv" width="280" height="280"></canvas>
-        </div>
+        <img src="our-photo.jpeg" alt="Us" style="width:100%; border-radius:15px;">
+        <h2 style="color:var(--pink);">It's a Date!</h2>
+        <p>Looks like you love me a lot!<br>— Siddharth</p>
     </div>
 
     <script>
         function go(n) {
-            document.querySelectorAll('.card, #game-screen').forEach(el => {
-                el.classList.add('hidden');
-                el.style.display = 'none';
-            });
-            let target = (n === 4) ? document.getElementById('game-screen') : document.getElementById('lvl' + n);
-            target.classList.remove('hidden');
-            target.style.display = 'block';
-            if(n === 1) initMaze();
+            document.querySelectorAll('.card, #game-screen').forEach(el => el.style.display = 'none');
+            const target = (n === 4) ? document.getElementById('game-screen') : document.getElementById('lvl' + n);
+            if (n === 4) target.style.display = 'flex'; else target.style.display = 'block';
+            
             if(n === 2) loadQ();
             if(n === 4) initCatch();
-            if(n === 5) initScratch();
         }
 
-        function initMaze() {
-            const p = document.getElementById('p-icon');
-            const box = document.getElementById('maze-container');
-            const moveMaze = (e) => {
-                e.preventDefault();
-                const r = box.getBoundingClientRect();
-                const t = e.touches[0];
-                const x = t.clientX - r.left;
-                const y = t.clientY - r.top;
-                const el = document.elementFromPoint(t.clientX, t.clientY);
-                if (el && !el.classList.contains('path-segment') && !el.id.includes('p-icon')) {
-                    p.style.left = '10px'; p.style.top = '5px';
-                } else {
-                    p.style.left = (x - 15) + 'px'; p.style.top = (y - 15) + 'px';
-                    if(x > 250 && y > 250) go(2);
-                }
-            };
-            box.addEventListener('touchmove', moveMaze, {passive: false});
+        // MAZE LOGIC
+        const player = document.getElementById('player');
+        const maze = document.getElementById('maze-area');
+
+        function resetPlayer() {
+            player.style.left = "10px";
+            player.style.top = "10px";
         }
 
+        maze.onmousemove = (e) => {
+            const rect = maze.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Simple collision: check if the element under mouse is the 'path'
+            const hoverEl = document.elementFromPoint(e.clientX, e.clientY);
+            if (hoverEl && !hoverEl.classList.contains('path') && hoverEl.id !== 'player') {
+                resetPlayer();
+            } else {
+                player.style.left = (x - 12) + "px";
+                player.style.top = (y - 12) + "px";
+                if (x > 260 && y > 260) go(2);
+            }
+        };
+
+        // QUIZ LOGIC
         let step = 0;
         const qs = [
-            { q: "Poorvi, where did we meet first?", o: ["Park", "Hospital", "School"], a: "Hospital" },
-            { q: "What was the first gift Siddharth gave you?", o: ["Teddy Bear", "Octopus 🐙", "Chocolates", "Flowers"], a: "Octopus 🐙" },
-            { q: "What do you like about Siddharth?", o: ["Intelligent", "Caring", "Kind", "All of the above"], a: "All of the above" },
-            { q: "How much do you love him?", o: ["A lot!", "Infinity + 1", "Unconditionally", "To the moon & back", "More than he loves me"], a: null }
+            { q: "Where did we meet first?", o: ["Park", "Hospital", "School"], a: "Hospital" },
+            { q: "First gift from Siddharth?", o: ["Octopus 🐙", "Teddy"], a: "Octopus 🐙" },
+            { q: "What do you like about him?", o: ["Kind", "Caring", "All of the above"], a: "All of the above" },
+            { q: "How much do you love him?", o: ["A lot!", "Infinity + 1", "To the moon & back"], a: null }
         ];
 
         function loadQ() {
@@ -177,77 +140,36 @@
             data.o.forEach(opt => {
                 const b = document.createElement('button');
                 b.innerText = opt; b.className = 'btn-opt';
-                b.onclick = () => {
-                    if(!data.a || opt === data.a) {
-                        step++;
-                        if(step < qs.length) loadQ(); else go(3);
-                    } else alert("Try again! ❤️");
-                };
+                b.onclick = () => { step++; if(step < qs.length) loadQ(); else go(4); };
                 div.appendChild(b);
             });
         }
 
-        let luv = 0;
-        function tap() {
-            luv += 10;
-            document.getElementById('fill').style.width = Math.min(luv, 100) + '%';
-            if(luv >= 100) setTimeout(() => go(4), 300);
-        }
-
-        let pts = 0;
-        let catchInterval;
+        // CATCHING GAME
+        let score = 0;
         function initCatch() {
             const b = document.getElementById('bucket');
-            const screen = document.getElementById('game-screen');
-            screen.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                b.style.left = e.touches[0].clientX + 'px';
-            }, {passive: false});
-
-            catchInterval = setInterval(() => {
-                if(pts >= 10) { clearInterval(catchInterval); go(5); return; }
+            window.onmousemove = (e) => { b.style.left = e.clientX + 'px'; };
+            
+            const gameInt = setInterval(() => {
+                if(score >= 10) { clearInterval(gameInt); go(5); return; }
                 const k = document.createElement('div');
                 k.className = 'kiss'; k.innerHTML = '💋';
-                k.style.left = Math.random() * (window.innerWidth - 50) + 'px';
-                k.style.top = '-60px';
-                screen.appendChild(k);
-                let y = -60;
+                k.style.left = Math.random() * window.innerWidth + 'px';
+                k.style.top = '-50px';
+                document.getElementById('game-screen').appendChild(k);
+                
+                let y = -50;
                 const fall = setInterval(() => {
                     y += 5; k.style.top = y + 'px';
-                    const br = b.getBoundingClientRect();
-                    const kr = k.getBoundingClientRect();
+                    const br = b.getBoundingClientRect(), kr = k.getBoundingClientRect();
                     if(kr.bottom >= br.top && kr.right >= br.left && kr.left <= br.right) {
-                        pts++; document.getElementById('score').innerText = pts;
+                        score++; document.getElementById('score').innerText = score;
                         clearInterval(fall); k.remove();
                     }
                     if(y > window.innerHeight) { clearInterval(fall); k.remove(); }
-                }, 16);
-            }, 800);
-        }
-
-        function initScratch() {
-            const c = document.getElementById('canv');
-            const ctx = c.getContext('2d');
-            ctx.fillStyle = '#ff4081'; ctx.fillRect(0,0,280,280);
-            ctx.fillStyle = 'white'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign='center';
-            ctx.fillText('Scratch for Siddharth ❤️', 140, 145);
-            const rub = (e) => {
-                e.preventDefault();
-                const r = c.getBoundingClientRect();
-                const t = e.touches[0];
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.beginPath(); ctx.arc(t.clientX-r.left, t.clientY-r.top, 35, 0, 6.28); ctx.fill();
-            };
-            c.addEventListener('touchmove', rub, {passive: false});
-            setInterval(clock, 1000);
-        }
-
-        function clock() {
-            const diff = new Date("Feb 14, 2026 00:00:00") - new Date();
-            document.getElementById('d').innerText = Math.max(0, Math.floor(diff / 86400000));
-            document.getElementById('h').innerText = Math.max(0, Math.floor((diff % 86400000) / 3600000));
-            document.getElementById('m').innerText = Math.max(0, Math.floor((diff % 3600000) / 60000));
-            document.getElementById('s').innerText = Math.max(0, Math.floor((diff % 60000) / 1000));
+                }, 20);
+            }, 1000);
         }
     </script>
 </body>
