@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Valentine's Challenge</title>
+    <title>For Poorvi ❤️</title>
     <style>
         :root {
             --primary-pink: #ff4081;
@@ -22,12 +22,12 @@
             font-family: -apple-system, system-ui, sans-serif;
             text-align: center;
             overflow: hidden;
-            touch-action: manipulation;
+            touch-action: none;
         }
 
         .card {
             background: white;
-            padding: 2rem 1.5rem;
+            padding: 2.5rem 1.5rem;
             border-radius: 24px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             width: 85%;
@@ -37,23 +37,25 @@
 
         .hidden { display: none !important; }
 
-        .btn-group { display: flex; flex-direction: column; gap: 12px; }
-
         button {
-            padding: 16px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: 700;
             border: none;
-            border-radius: 14px;
+            border-radius: 16px;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
+            transition: transform 0.2s;
         }
 
-        .choice-btn { background-color: #fce4ec; color: #d81b60; border: 2px solid #f8bbd0; }
-        #yesBtn { background-color: var(--primary-pink); color: white; width: 100%; margin-bottom: 10px; }
-        #noBtn { background-color: #e0e0e0; color: #757575; position: absolute; width: 80px; z-index: 100; }
+        button:active { transform: scale(0.95); }
 
-        /* Game Styles */
+        .choice-btn { background-color: #fce4ec; color: #d81b60; border: 2px solid #f8bbd0; margin: 6px 0; width: 100%; }
+        #yesBtn, .primary-btn { background-color: var(--primary-pink); color: white; width: 100%; }
+
+        h1 { color: var(--text-red); font-size: 1.8rem; line-height: 1.2; }
+        p { color: #666; font-size: 1.1rem; }
+
         #game-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -62,26 +64,43 @@
             z-index: 20;
         }
 
-        .kiss {
+        #bucket {
             position: absolute;
-            font-size: 2rem;
-            cursor: pointer;
-            user-select: none;
-            animation: fall linear forwards;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
         }
 
-        @keyframes fall {
-            to { transform: translateY(110vh); }
-        }
-
+        .kiss { position: absolute; font-size: 2.5rem; user-select: none; }
         #score-board {
-            position: absolute;
-            top: 50px;
-            width: 100%;
-            font-size: 1.5rem;
+            position: absolute; top: 60px; width: 100%; font-size: 1.4rem;
+            color: white; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #countdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .time-box {
+            background: var(--primary-pink);
             color: white;
+            padding: 8px 4px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+        .time-box span {
+            display: block;
+            font-size: 1.1rem;
             font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -89,57 +108,71 @@
 
     <div id="section1" class="card">
         <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp4ZzRndnFvNm9pbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpNUMo/giphy.gif" width="120">
+        <h1>Hi Poorvi! ❤️</h1>
+        <p>Siddharth has a very important question for you...</p>
         <h1>Will you be my Valentine?</h1>
-        <div style="height: 140px; position: relative; width: 100%; margin-top: 20px;">
-            <button id="yesBtn" onclick="showQuiz()">Yes!</button>
-            <button id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()">No</button>
+        <div style="margin-top: 25px;">
+            <button id="yesBtn" onclick="showIntro()">Yes!</button>
         </div>
+    </div>
+
+    <div id="section-intro" class="card hidden">
+        <h1>Not so fast, Poorvi! 😉</h1>
+        <p>Siddharth needs to know if you're truly ready. Show him how much you love him!</p>
+        <button class="primary-btn" onclick="showQuiz()">I'm Ready! 💖</button>
     </div>
 
     <div id="section2" class="card hidden">
         <h1 id="quizTitle">Question 1</h1>
         <p id="questionText"></p>
-        <div class="btn-group" id="options"></div>
+        <div id="options"></div>
     </div>
 
     <div id="game-container">
-        <div id="score-board">Catch 10 Kisses: <span id="score">0</span></div>
+        <div id="score-board">Poorvi, catch 10 kisses from Siddharth!<br>Score: <span id="score">0</span></div>
+        <div id="bucket">🧺</div>
     </div>
 
     <div id="section4" class="card hidden">
-        <h1>Victory! ❤️</h1>
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnJueHdzbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/5GoVLqeAOo6PK/giphy.gif" width="150">
-        <p>You caught all my love! See you on Valentine's Day!</p>
+        <h1>Victory, Poorvi! ❤️</h1>
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnJueHdzbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/5GoVLqeAOo6PK/giphy.gif" width="120">
+        <p>Siddharth is so lucky to have you. See you in:</p>
+        
+        <div id="countdown">
+            <div class="time-box"><span id="days">0</span>Days</div>
+            <div class="time-box"><span id="hours">0</span>Hrs</div>
+            <div class="time-box"><span id="mins">0</span>Mins</div>
+            <div class="time-box"><span id="secs">0</span>Secs</div>
+        </div>
+        <p style="margin-top:20px; font-weight:bold; color:var(--primary-pink);">Love you! - Siddharth</p>
     </div>
 
     <script>
         let currentStep = 0;
         let score = 0;
         const targetScore = 10;
-        
+        let gameActive = false;
+
         const questions = [
-            { q: "Where did we meet first?", options: ["The Park", "Hospital", "Coffee Shop", "School"], correct: "Hospital" },
-            { q: "What is my absolute favorite food?", options: ["Pizza 🍕", "Sushi 🍣", "Your Cooking 🍳", "Tacos 🌮"], correct: "Your Cooking 🍳" },
-            { q: "How much do you love me?", options: ["A lot!", "To the moon and back", "More than coffee", "Infinity + 1"], correct: null }
+            { q: "Poorvi, where did we meet first?", options: ["The Park", "Hospital", "Coffee Shop", "School"], correct: "Hospital" },
+            { q: "What is Siddharth's absolute favorite food?", options: ["Pizza 🍕", "Sushi 🍣", "Your Cooking 🍳", "Tacos 🌮"], correct: "Your Cooking 🍳" },
+            { q: "On a scale of 1 to Infinity, how much do you love Siddharth?", options: ["A lot!", "To the moon and back", "More than coffee", "Infinity + 1"], correct: null }
         ];
 
-        function moveButton() {
-            const btn = document.getElementById('noBtn');
-            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 20);
-            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 20);
-            btn.style.left = Math.max(10, x) + 'px';
-            btn.style.top = Math.max(10, y) + 'px';
+        function showIntro() {
+            document.getElementById('section1').classList.add('hidden');
+            document.getElementById('section-intro').classList.remove('hidden');
         }
 
         function showQuiz() {
-            document.getElementById('section1').classList.add('hidden');
+            document.getElementById('section-intro').classList.add('hidden');
             document.getElementById('section2').classList.remove('hidden');
             loadQuestion();
         }
 
         function loadQuestion() {
             if (currentStep < questions.length) {
-                document.getElementById('quizTitle').innerText = `Question ${currentStep + 1}`;
+                document.getElementById('quizTitle').innerText = `Challenge ${currentStep + 1}`;
                 document.getElementById('questionText').innerText = questions[currentStep].q;
                 const optionsDiv = document.getElementById('options');
                 optionsDiv.innerHTML = ''; 
@@ -151,57 +184,96 @@
                     optionsDiv.appendChild(btn);
                 });
             } else {
-                startMiniGame();
+                startBucketGame();
             }
         }
 
         function checkAnswer(selected) {
             if (questions[currentStep].correct && selected !== questions[currentStep].correct) {
-                alert("Wrong! Try again! ❤️");
+                alert("Wrong, Poorvi! Siddharth knows you remember! 😂 ❤️");
             } else {
                 currentStep++;
                 loadQuestion();
             }
         }
 
-        function startMiniGame() {
+        function startBucketGame() {
             document.getElementById('section2').classList.add('hidden');
-            document.getElementById('game-container').style.display = 'block';
-            gameLoop();
-        }
+            const container = document.getElementById('game-container');
+            container.style.display = 'block';
+            gameActive = true;
 
-        function gameLoop() {
-            if (score < targetScore) {
-                createKiss();
-                setTimeout(gameLoop, 800);
-            }
-        }
-
-        function createKiss() {
-            const kiss = document.createElement('div');
-            kiss.innerHTML = '💋';
-            kiss.className = 'kiss';
-            kiss.style.left = Math.random() * 90 + 'vw';
-            kiss.style.animationDuration = (Math.random() * 2 + 2) + 's';
-            
-            // Catching the kiss
-            kiss.onclick = kiss.ontouchstart = () => {
-                score++;
-                document.getElementById('score').innerText = score;
-                kiss.remove();
-                if (score >= targetScore) showFinal();
+            const moveHandler = (e) => {
+                if(!gameActive) return;
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const bucket = document.getElementById('bucket');
+                let newX = x - (bucket.offsetWidth / 2);
+                newX = Math.max(0, Math.min(newX, window.innerWidth - bucket.offsetWidth));
+                bucket.style.left = newX + 'px';
+                bucket.style.transform = 'none';
             };
-            
-            document.getElementById('game-container').appendChild(kiss);
-            
-            // Remove if not caught
-            setTimeout(() => { if(kiss) kiss.remove(); }, 4000);
+
+            container.addEventListener('touchstart', moveHandler);
+            container.addEventListener('touchmove', moveHandler);
+            container.addEventListener('mousemove', moveHandler);
+
+            spawnKisses();
         }
 
-        function showFinal() {
+        function spawnKisses() {
+            if (!gameActive || score >= targetScore) return;
+            const kiss = document.createElement('div');
+            kiss.className = 'kiss';
+            kiss.innerHTML = '💋';
+            kiss.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+            kiss.style.top = '-50px';
+            document.getElementById('game-container').appendChild(kiss);
+
+            let posY = -50;
+            const speed = 4 + Math.random() * 3;
+
+            const fall = setInterval(() => {
+                if (!gameActive) { clearInterval(fall); kiss.remove(); return; }
+                posY += speed;
+                kiss.style.top = posY + 'px';
+                const bucket = document.getElementById('bucket').getBoundingClientRect();
+                const kRect = kiss.getBoundingClientRect();
+
+                if (kRect.bottom >= bucket.top && kRect.right >= bucket.left && 
+                    kRect.left <= bucket.right && kRect.top <= bucket.bottom) {
+                    score++;
+                    document.getElementById('score').innerText = score;
+                    kiss.remove();
+                    clearInterval(fall);
+                    if (score >= targetScore) winGame();
+                }
+                if (posY > window.innerHeight) { clearInterval(fall); kiss.remove(); }
+            }, 20);
+            setTimeout(spawnKisses, 800);
+        }
+
+        function winGame() {
+            gameActive = false;
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('section4').classList.remove('hidden');
             document.body.style.backgroundColor = "#ffc1e3";
+            startCountdown();
+        }
+
+        function startCountdown() {
+            const target = new Date("Feb 14, 2026 00:00:00").getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = target - now;
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById("days").innerText = d;
+                document.getElementById("hours").innerText = h;
+                document.getElementById("mins").innerText = m;
+                document.getElementById("secs").innerText = s;
+            }, 1000);
         }
     </script>
 </body>
