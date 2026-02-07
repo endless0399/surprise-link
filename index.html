@@ -20,14 +20,18 @@
         h1 { color: #d32f2f; margin-bottom: 10px; }
         p { color: #555; line-height: 1.5; }
         
-        /* Level 1: Maze */
+        /* Level 1: Simple Maze */
         #maze-area { 
-            position: relative; width: 300px; height: 300px; background: var(--pink); 
-            margin: 20px auto; border-radius: 10px; overflow: hidden; cursor: crosshair;
+            position: relative; width: 320px; height: 150px; background: var(--pink); 
+            margin: 20px auto; border-radius: 15px; overflow: hidden; cursor: crosshair;
         }
-        .path { position: absolute; background: white; z-index: 1; }
-        #player { position: absolute; top: 10px; left: 10px; font-size: 25px; z-index: 10; pointer-events: none; }
-        #goal { position: absolute; bottom: 10px; right: 10px; font-size: 30px; z-index: 2; }
+        .path { 
+            position: absolute; background: white; 
+            top: 40px; left: 0; width: 320px; height: 70px; 
+            z-index: 1; 
+        }
+        #player { position: absolute; top: 60px; left: 10px; font-size: 30px; z-index: 10; pointer-events: none; }
+        #goal { position: absolute; top: 55px; right: 10px; font-size: 35px; z-index: 2; }
 
         /* Level 3: Love Meter */
         .bar-container { width: 100%; height: 30px; background: #eee; border-radius: 15px; margin: 20px 0; overflow: hidden; border: 2px solid #f8bbd0; }
@@ -53,20 +57,15 @@
 
     <div id="lvl0" class="card">
         <h1>Hi Poorvi! ❤️</h1>
-        <p>Siddharth has a special quest for you. Reach the end to see the surprise!</p>
+        <p>Siddharth has a special quest for you. Let's see how intelligent you are</p>
         <button onclick="go(1)">Start Quest</button>
     </div>
 
     <div id="lvl1" class="card hidden">
         <h1>Challenge 1: The Path</h1>
-        <p>Stay on the white! Touching the pink resets the runner.</p>
+        <p>Drag the runner 🏃‍♀️ across the white path to reach Siddharth!</p>
         <div id="maze-area">
-            <div class="path" style="top:0; left:0; width:60px; height:100px;"></div>
-            <div class="path" style="top:60px; left:0; width:250px; height:40px;"></div>
-            <div class="path" style="top:60px; left:210px; width:40px; height:150px;"></div>
-            <div class="path" style="top:170px; left:50px; width:200px; height:40px;"></div>
-            <div class="path" style="top:170px; left:50px; width:40px; height:130px;"></div>
-            <div class="path" style="top:260px; left:50px; width:250px; height:40px;"></div>
+            <div class="path"></div>
             <div id="player">🏃‍♀️</div>
             <div id="goal">🙋‍♂️</div>
         </div>
@@ -117,30 +116,29 @@
             if(n === 4) initCatch();
         }
 
-        // MAZE
+        // MAZE LOGIC
         const player = document.getElementById('player');
         const maze = document.getElementById('maze-area');
         maze.onmousemove = (e) => {
             if (document.getElementById('lvl1').style.display === 'none') return;
             const rect = maze.getBoundingClientRect();
-            const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            const hoverEl = document.elementFromPoint(e.clientX, e.clientY);
-            if (hoverEl && !hoverEl.classList.contains('path')) {
-                player.style.left = "10px"; player.style.top = "10px";
+            const x = e.clientX - rect.left;
+            if (y < 40 || y > 110) {
+                player.style.left = "10px"; player.style.top = "60px";
             } else {
-                player.style.left = (x - 12) + "px"; player.style.top = (y - 12) + "px";
-                if (x > 260 && y > 260) go(2);
+                player.style.left = (x - 15) + "px"; player.style.top = (y - 15) + "px";
+                if (x > 280) go(2);
             }
         };
 
-        // QUIZ
+        // QUIZ LOGIC
         let step = 0;
         const qs = [
-            { q: "Poorvi, where did we meet first?", o: ["Park", "Hospital", "School"], a: "Hospital" },
-            { q: "What was the first gift Siddharth gave you?", o: ["Teddy Bear", "Octopus 🐙", "Chocolates", "Flowers"], a: "Octopus 🐙" },
-            { q: "What do you like about Siddharth?", o: ["Intelligent", "Caring", "Kind", "All of the above"], a: "All of the above" },
-            { q: "How much do you love him?", o: ["A lot!", "Infinity + 1", "Unconditionally", "To the moon & back", "More than he loves me"], a: null }
+            { q: "Poorvi, where did we meet first?", o: ["Park 🌳", "Hospital 🏥", "School 🏫"], a: "Hospital 🏥" },
+            { q: "What was the first gift Siddharth gave you?", o: ["Teddy Bear 🧸", "Octopus 🐙", "Chocolates 🍫", "Flowers 💐"], a: "Octopus 🐙" },
+            { q: "What do you like about Siddharth?", o: ["Intelligent 🧠", "Caring 🫂", "Kind ✨", "All of the above ❤️"], a: "All of the above ❤️" },
+            { q: "How much do you love him?", o: ["A lot! 🥰", "Infinity + 1 ♾️", "Unconditionally 🌎", "To the moon & back 🌙", "More than he loves me 😤"], a: null }
         ];
 
         function loadQ() {
@@ -154,43 +152,28 @@
                 b.onclick = () => { 
                     if(!data.a || opt === data.a) {
                         step++; if(step < qs.length) loadQ(); else go(3); 
-                    } else { alert("Try again! ❤️"); }
+                    } else { alert("Try again, sweetheart ❤️"); }
                 };
                 div.appendChild(b);
             });
         }
 
-        // LOVE METER
+        // LOVE METER logic
         function startLuvDrain() {
-            luvInterval = setInterval(() => {
-                if (luv > 0) {
-                    luv -= 1.8; // Speed of drain
-                    updateBar();
-                }
-            }, 100);
+            luvInterval = setInterval(() => { if (luv > 0) { luv -= 1.8; updateBar(); } }, 100);
         }
-
         function tapHeart() {
             luv += 12;
-            if (luv >= 100) {
-                luv = 100; updateBar();
-                clearInterval(luvInterval);
-                setTimeout(() => go(4), 300);
-            }
+            if (luv >= 100) { luv = 100; updateBar(); clearInterval(luvInterval); setTimeout(() => go(4), 300); }
             updateBar();
         }
+        function updateBar() { document.getElementById('fill').style.width = luv + '%'; }
 
-        function updateBar() {
-            document.getElementById('fill').style.width = luv + '%';
-        }
-
-        // CATCHING (5 KISSES)
+        // CATCHING GAME logic
         let score = 0;
         function initCatch() {
             const b = document.getElementById('bucket');
-            window.onmousemove = (e) => { 
-                b.style.left = e.clientX + 'px'; b.style.transform = 'translateX(-50%)';
-            };
+            window.onmousemove = (e) => { b.style.left = e.clientX + 'px'; b.style.transform = 'translateX(-50%)'; };
             const gameInt = setInterval(() => {
                 if(score >= 5) { clearInterval(gameInt); go(5); return; }
                 const k = document.createElement('div');
