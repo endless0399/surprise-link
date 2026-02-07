@@ -99,7 +99,7 @@
     </div>
 
     <div id="lvl5" class="card hidden">
-        <h2 style="color:var(--pink); margin-bottom: 10px;">Happy Propose Day! 💍✨</h2>
+        <h2 style="color:var(--pink); margin-bottom: 10px;">Happy Propose Day, Poorvi! 💍✨</h2>
         <div id="scratch-container">
             <img src="our-photo.jpeg" class="couple-img">
             <canvas id="scratch-canvas" width="280" height="280"></canvas>
@@ -112,7 +112,11 @@
     <script>
         let lastTouchEnd = 0, luv = 0, luvInterval, step = 0, score = 0;
 
-        function revealQuestion(el) { el.innerText = "Will you be my Valentine? 🌹"; el.classList.add('revealed'); document.getElementById('yes-btn').style.display = 'block'; }
+        function revealQuestion(el) { 
+            el.innerText = "Will you be my Valentine? 🌹"; 
+            el.classList.add('revealed'); 
+            document.getElementById('yes-btn').style.display = 'block'; 
+        }
         
         function celebrate() {
             const duration = 5 * 1000; const end = Date.now() + duration;
