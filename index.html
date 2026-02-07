@@ -5,103 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>For Poorvi ❤️</title>
     <style>
-        :root {
-            --primary-pink: #ff4081;
-            --soft-pink: #ffebee;
-            --text-red: #d32f2f;
+        :root { 
+            --primary-pink: #ff4081; 
+            --soft-pink: #ffebee; 
+            --text-red: #d32f2f; 
         }
 
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: var(--soft-pink);
-            font-family: -apple-system, system-ui, sans-serif;
-            text-align: center;
-            overflow: hidden;
-            touch-action: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0; background-color: var(--soft-pink);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            text-align: center; overflow: hidden; touch-action: none;
+            /* iPhone Safe Area Handling */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .card {
-            background: white;
-            padding: 2.5rem 1.5rem;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            width: 85%;
-            max-width: 350px;
-            z-index: 10;
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px);
+            padding: 2rem 1.5rem; border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(255, 64, 129, 0.2); 
+            width: 85%; max-width: 360px; z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .hidden { display: none !important; }
 
+        h1 { color: var(--text-red); font-size: 1.8rem; margin-bottom: 10px; font-weight: 800; }
+        p { color: #555; font-size: 1.1rem; line-height: 1.4; }
+
         button {
-            padding: 18px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border: none;
-            border-radius: 16px;
-            cursor: pointer;
+            padding: 18px; font-size: 1.2rem; font-weight: 700; border: none;
+            border-radius: 20px; cursor: pointer; width: 100%; margin-top: 12px;
             -webkit-tap-highlight-color: transparent;
-            transition: transform 0.2s;
+            transition: transform 0.1s ease;
         }
+        button:active { transform: scale(0.96); }
 
-        button:active { transform: scale(0.95); }
+        .primary-btn { background: linear-gradient(135deg, #ff4081, #f50057); color: white; box-shadow: 0 5px 15px rgba(255, 64, 129, 0.4); }
+        .choice-btn { background-color: #ffffff; color: #d81b60; border: 2px solid #f8bbd0; }
 
-        .choice-btn { background-color: #fce4ec; color: #d81b60; border: 2px solid #f8bbd0; margin: 6px 0; width: 100%; }
-        #yesBtn, .primary-btn { background-color: var(--primary-pink); color: white; width: 100%; }
+        /* LEVEL 1: MAZE - Sized for iPhone width */
+        #maze-container { position: relative; width: 300px; height: 300px; background: #fff; margin: 15px auto; border: 4px solid var(--primary-pink); border-radius: 20px; overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+        #player { position: absolute; width: 40px; height: 40px; font-size: 30px; z-index: 5; top: 10px; left: 10px; display: flex; align-items: center; justify-content: center; }
+        #goal { position: absolute; width: 40px; height: 40px; font-size: 30px; bottom: 10px; right: 10px; }
 
-        h1 { color: var(--text-red); font-size: 1.8rem; line-height: 1.2; }
-        p { color: #666; font-size: 1.1rem; }
+        /* LEVEL 3: LOVE METER */
+        #heart-tap { font-size: 6rem; transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; user-select: none; margin: 25px 0; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
+        .progress-bar { width: 100%; height: 24px; background: #eee; border-radius: 12px; overflow: hidden; border: 2px solid #fff; }
+        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff80ab, #ff4081); transition: width 0.1s; }
 
-        #game-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(#ffc1e3, #ff80ab);
-            display: none;
-            z-index: 20;
-        }
+        /* LEVEL 4: BASKET GAME AREA */
+        #game-area { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(#ffc1e3, #ff80ab); display: none; z-index: 20; }
+        #bucket { position: absolute; bottom: calc(60px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); font-size: 6rem; pointer-events: none; }
+        .kiss { position: absolute; font-size: 2.8rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
 
-        #bucket {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 4rem;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-        }
-
-        .kiss { position: absolute; font-size: 2.5rem; user-select: none; }
-        #score-board {
-            position: absolute; top: 60px; width: 100%; font-size: 1.4rem;
-            color: white; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        #countdown {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 20px;
-        }
-        .time-box {
-            background: var(--primary-pink);
-            color: white;
-            padding: 8px 4px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-        }
-        .time-box span {
-            display: block;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
+        /* LEVEL 5: SCRATCH CARD */
+        #scratch-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
+        #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 2; touch-action: none; border-radius: 20px; }
+        .reveal-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 1; background: white; border-radius: 20px; }
+        #countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; width: 95%; }
+        .time-box { background: var(--primary-pink); color: white; padding: 10px 5px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .time-box span { display: block; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -109,170 +75,177 @@
     <div id="section1" class="card">
         <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp4ZzRndnFvNm9pbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpNUMo/giphy.gif" width="120">
         <h1>Hi Poorvi! ❤️</h1>
-        <p>Siddharth has a very important question for you...</p>
-        <h1>Will you be my Valentine?</h1>
-        <div style="margin-top: 25px;">
-            <button id="yesBtn" onclick="showIntro()">Yes!</button>
+        <p>Siddharth has a special Valentine's quest for you. Beat the levels to unlock your surprise!</p>
+        <button class="primary-btn" onclick="nextLevel(1)">Start Quest</button>
+    </div>
+
+    <div id="level1" class="card hidden">
+        <h1>Level 1: Maze</h1>
+        <p>Lead 🏃‍♀️ to Siddharth 🙋‍♂️</p>
+        <div id="maze-container">
+            <div id="player">🏃‍♀️</div>
+            <div id="goal">🙋‍♂️</div>
         </div>
     </div>
 
-    <div id="section-intro" class="card hidden">
-        <h1>Not so fast, Poorvi! 😉</h1>
-        <p>Siddharth needs to know if you're truly ready. Show him how much you love him!</p>
-        <button class="primary-btn" onclick="showQuiz()">I'm Ready! 💖</button>
-    </div>
-
-    <div id="section2" class="card hidden">
-        <h1 id="quizTitle">Question 1</h1>
+    <div id="level2" class="card hidden">
+        <h1 id="quizTitle">Level 2: Quiz</h1>
         <p id="questionText"></p>
         <div id="options"></div>
     </div>
 
-    <div id="game-container">
-        <div id="score-board">Poorvi, catch 10 kisses from Siddharth!<br>Score: <span id="score">0</span></div>
+    <div id="level3" class="card hidden">
+        <h1>Level 3: Charge ❤️</h1>
+        <p>TAP the heart fast!</p>
+        <div id="heart-tap" onclick="tapHeart()">❤️</div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="game-area">
+        <div style="position:absolute; top:calc(40px + env(safe-area-inset-top)); width:100%; color:white; font-weight:bold; font-size:1.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">Catch Siddharth's Kisses!<br><span style="font-size:2rem">Score: <span id="score">0</span></span></div>
         <div id="bucket">🧺</div>
     </div>
 
-    <div id="section4" class="card hidden">
-        <h1>Victory, Poorvi! ❤️</h1>
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnJueHdzbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/5GoVLqeAOo6PK/giphy.gif" width="120">
-        <p>Siddharth is so lucky to have you. See you in:</p>
-        
-        <div id="countdown">
-            <div class="time-box"><span id="days">0</span>Days</div>
-            <div class="time-box"><span id="hours">0</span>Hrs</div>
-            <div class="time-box"><span id="mins">0</span>Mins</div>
-            <div class="time-box"><span id="secs">0</span>Secs</div>
+    <div id="level5" class="card hidden">
+        <h1>Final Surprise ❤️</h1>
+        <p>Scratch to reveal!</p>
+        <div id="scratch-container">
+            <div class="reveal-content">
+                <h2 style="color:var(--primary-pink); margin:0; font-size: 1.5rem;">It's a Date!</h2>
+                <div id="countdown">
+                    <div class="time-box"><span id="days">0</span>D</div>
+                    <div class="time-box"><span id="hours">0</span>H</div>
+                    <div class="time-box"><span id="mins">0</span>M</div>
+                    <div class="time-box"><span id="secs">0</span>S</div>
+                </div>
+                <p style="margin-top:15px; font-weight:bold; color:#444;">I love you, Poorvi!<br>— Siddharth</p>
+            </div>
+            <canvas id="scratch-canvas" width="280" height="280"></canvas>
         </div>
-        <p style="margin-top:20px; font-weight:bold; color:var(--primary-pink);">Love you! - Siddharth</p>
     </div>
 
     <script>
-        let currentStep = 0;
-        let score = 0;
-        const targetScore = 10;
-        let gameActive = false;
+        let currentLvl = 1;
 
+        function nextLevel(lvl) {
+            document.querySelectorAll('.card, #game-area').forEach(el => el.style.display = 'none');
+            const target = document.getElementById(lvl === 'game' ? 'game-area' : 'level' + lvl);
+            if(target) target.style.display = 'block';
+            
+            if(lvl === 1) initMaze();
+            if(lvl === 2) loadQuestion();
+            if(lvl === 'game') initBasketGame();
+            if(lvl === 5) initScratchCard();
+        }
+
+        function initMaze() {
+            const p = document.getElementById('player');
+            const m = document.getElementById('maze-container');
+            const move = (e) => {
+                const r = m.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                let x = clientX - r.left - 20;
+                let y = clientY - r.top - 20;
+                p.style.left = Math.max(0, Math.min(260, x)) + 'px';
+                p.style.top = Math.max(0, Math.min(260, y)) + 'px';
+                if(x > 220 && y > 220) nextLevel(2);
+            };
+            m.ontouchmove = m.onmousemove = move;
+        }
+
+        let qStep = 0;
         const questions = [
-            { q: "Poorvi, where did we meet first?", options: ["The Park", "Hospital", "Coffee Shop", "School"], correct: "Hospital" },
-            { q: "What is Siddharth's absolute favorite food?", options: ["Pizza 🍕", "Sushi 🍣", "Your Cooking 🍳", "Tacos 🌮"], correct: "Your Cooking 🍳" },
-            { q: "On a scale of 1 to Infinity, how much do you love Siddharth?", options: ["A lot!", "To the moon and back", "More than coffee", "Infinity + 1"], correct: null }
+            { q: "Poorvi, where did we meet first?", opts: ["The Park", "Hospital", "Coffee Shop", "School"], a: "Hospital" },
+            { q: "What is Siddharth's absolute favorite food?", opts: ["Pizza 🍕", "Sushi 🍣", "Your Cooking 🍳", "Tacos 🌮"], a: "Your Cooking 🍳" },
+            { q: "How much do you love Siddharth?", opts: ["A lot!", "To the moon and back", "Infinity + 1"], a: null }
         ];
 
-        function showIntro() {
-            document.getElementById('section1').classList.add('hidden');
-            document.getElementById('section-intro').classList.remove('hidden');
-        }
-
-        function showQuiz() {
-            document.getElementById('section-intro').classList.add('hidden');
-            document.getElementById('section2').classList.remove('hidden');
-            loadQuestion();
-        }
-
         function loadQuestion() {
-            if (currentStep < questions.length) {
-                document.getElementById('quizTitle').innerText = `Challenge ${currentStep + 1}`;
-                document.getElementById('questionText').innerText = questions[currentStep].q;
-                const optionsDiv = document.getElementById('options');
-                optionsDiv.innerHTML = ''; 
-                questions[currentStep].options.forEach(opt => {
-                    const btn = document.createElement('button');
-                    btn.innerText = opt;
-                    btn.className = 'choice-btn';
-                    btn.onclick = () => checkAnswer(opt);
-                    optionsDiv.appendChild(btn);
-                });
-            } else {
-                startBucketGame();
-            }
-        }
-
-        function checkAnswer(selected) {
-            if (questions[currentStep].correct && selected !== questions[currentStep].correct) {
-                alert("Wrong, Poorvi! Siddharth knows you remember! 😂 ❤️");
-            } else {
-                currentStep++;
-                loadQuestion();
-            }
-        }
-
-        function startBucketGame() {
-            document.getElementById('section2').classList.add('hidden');
-            const container = document.getElementById('game-container');
-            container.style.display = 'block';
-            gameActive = true;
-
-            const moveHandler = (e) => {
-                if(!gameActive) return;
-                const x = e.touches ? e.touches[0].clientX : e.clientX;
-                const bucket = document.getElementById('bucket');
-                let newX = x - (bucket.offsetWidth / 2);
-                newX = Math.max(0, Math.min(newX, window.innerWidth - bucket.offsetWidth));
-                bucket.style.left = newX + 'px';
-                bucket.style.transform = 'none';
-            };
-
-            container.addEventListener('touchstart', moveHandler);
-            container.addEventListener('touchmove', moveHandler);
-            container.addEventListener('mousemove', moveHandler);
-
-            spawnKisses();
-        }
-
-        function spawnKisses() {
-            if (!gameActive || score >= targetScore) return;
-            const kiss = document.createElement('div');
-            kiss.className = 'kiss';
-            kiss.innerHTML = '💋';
-            kiss.style.left = Math.random() * (window.innerWidth - 40) + 'px';
-            kiss.style.top = '-50px';
-            document.getElementById('game-container').appendChild(kiss);
-
-            let posY = -50;
-            const speed = 4 + Math.random() * 3;
-
-            const fall = setInterval(() => {
-                if (!gameActive) { clearInterval(fall); kiss.remove(); return; }
-                posY += speed;
-                kiss.style.top = posY + 'px';
-                const bucket = document.getElementById('bucket').getBoundingClientRect();
-                const kRect = kiss.getBoundingClientRect();
-
-                if (kRect.bottom >= bucket.top && kRect.right >= bucket.left && 
-                    kRect.left <= bucket.right && kRect.top <= bucket.bottom) {
-                    score++;
-                    document.getElementById('score').innerText = score;
-                    kiss.remove();
-                    clearInterval(fall);
-                    if (score >= targetScore) winGame();
+            const q = questions[qStep];
+            document.getElementById('quizTitle').innerText = "Level 2: Memory";
+            document.getElementById('questionText').innerText = q.q;
+            const optDiv = document.getElementById('options');
+            optDiv.innerHTML = '';
+            q.opts.forEach(o => {
+                const b = document.createElement('button');
+                b.innerText = o; b.className = 'choice-btn';
+                b.onclick = () => {
+                    if(!q.a || o === q.a) {
+                        qStep++;
+                        if(qStep < questions.length) loadQuestion();
+                        else nextLevel(3);
+                    } else { alert("Siddharth knows you remember! ❤️"); }
                 }
-                if (posY > window.innerHeight) { clearInterval(fall); kiss.remove(); }
-            }, 20);
-            setTimeout(spawnKisses, 800);
+                optDiv.appendChild(b);
+            });
         }
 
-        function winGame() {
-            gameActive = false;
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('section4').classList.remove('hidden');
-            document.body.style.backgroundColor = "#ffc1e3";
+        let lScore = 0;
+        function tapHeart() {
+            lScore += 10;
+            document.getElementById('progress-fill').style.width = lScore + '%';
+            document.getElementById('heart-tap').style.transform = 'scale(1.3)';
+            setTimeout(() => { document.getElementById('heart-tap').style.transform = 'scale(1)'; }, 100);
+            if(lScore >= 100) nextLevel('game');
+        }
+
+        let bScore = 0;
+        function initBasketGame() {
+            const bucket = document.getElementById('bucket');
+            const area = document.getElementById('game-area');
+            area.ontouchmove = area.onmousemove = (e) => {
+                let x = (e.touches ? e.touches[0].clientX : e.clientX) - 60;
+                bucket.style.left = Math.max(0, Math.min(window.innerWidth - 120, x)) + 'px';
+            };
+            const spawn = setInterval(() => {
+                if(bScore >= 10) { clearInterval(spawn); nextLevel(5); return; }
+                const k = document.createElement('div');
+                k.className = 'kiss'; k.innerHTML = '💋';
+                k.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+                k.style.top = '-60px';
+                area.appendChild(k);
+                let ky = -60;
+                const fall = setInterval(() => {
+                    ky += 5; k.style.top = ky + 'px';
+                    const br = bucket.getBoundingClientRect();
+                    const kr = k.getBoundingClientRect();
+                    if(kr.bottom >= br.top + 20 && kr.right >= br.left && kr.left <= br.right) {
+                        bScore++; document.getElementById('score').innerText = bScore;
+                        clearInterval(fall); k.remove();
+                    }
+                    if(ky > window.innerHeight) { clearInterval(fall); k.remove(); }
+                }, 16);
+            }, 700);
+        }
+
+        function initScratchCard() {
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ff4081';
+            ctx.fillRect(0,0,280,280);
+            ctx.fillStyle = 'white'; ctx.font = 'bold 22px sans-serif'; 
+            ctx.textAlign = "center";
+            ctx.fillText('Scratch for Poorvi ❤️', 140, 145);
+            const scratch = (e) => {
+                const r = canvas.getBoundingClientRect();
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath(); ctx.arc(x, y, 40, 0, Math.PI*2); ctx.fill();
+            };
+            canvas.ontouchmove = canvas.onmousemove = scratch;
             startCountdown();
         }
 
         function startCountdown() {
             const target = new Date("Feb 14, 2026 00:00:00").getTime();
             setInterval(() => {
-                const now = new Date().getTime();
-                const diff = target - now;
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                document.getElementById("days").innerText = d;
-                document.getElementById("hours").innerText = h;
-                document.getElementById("mins").innerText = m;
-                document.getElementById("secs").innerText = s;
+                const diff = target - new Date().getTime();
+                document.getElementById("days").innerText = Math.max(0, Math.floor(diff / 86400000));
+                document.getElementById("hours").innerText = Math.max(0, Math.floor((diff % 86400000) / 3600000));
+                document.getElementById("mins").innerText = Math.max(0, Math.floor((diff % 3600000) / 60000));
+                document.getElementById("secs").innerText = Math.max(0, Math.floor((diff % 60000) / 1000));
             }, 1000);
         }
     </script>
