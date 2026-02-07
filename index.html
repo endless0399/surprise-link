@@ -9,50 +9,44 @@
             margin: 0; background: var(--bg); 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
         }
         .card { 
             background: white; padding: 30px; border-radius: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 400px; text-align: center;
+            z-index: 10;
         }
         .hidden { display: none; }
         h1 { color: #d32f2f; margin-bottom: 10px; }
         p { color: #555; line-height: 1.5; }
         
-        /* The Maze Path */
+        /* Level 1: Maze */
         #maze-area { 
             position: relative; width: 300px; height: 300px; background: var(--pink); 
-            margin: 20px auto; border-radius: 10px; overflow: hidden;
-            cursor: crosshair;
+            margin: 20px auto; border-radius: 10px; overflow: hidden; cursor: crosshair;
         }
         .path { position: absolute; background: white; z-index: 1; }
-        #player { 
-            position: absolute; top: 10px; left: 10px; font-size: 25px; 
-            z-index: 10; pointer-events: none;
-        }
+        #player { position: absolute; top: 10px; left: 10px; font-size: 25px; z-index: 10; pointer-events: none; }
         #goal { position: absolute; bottom: 10px; right: 10px; font-size: 30px; z-index: 2; }
 
-        /* UI Elements */
-        button { 
-            width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; 
-            border: none; background: var(--pink); color: white; 
-            font-weight: bold; cursor: pointer; font-size: 1rem;
-        }
-        .btn-opt { background: #fce4ec; color: #d81b60; border: 1px solid #f8bbd0; }
-        
-        /* Catch Game */
+        /* Level 3: Love Meter */
+        .bar-container { width: 100%; height: 30px; background: #eee; border-radius: 15px; margin: 20px 0; overflow: hidden; border: 2px solid #f8bbd0; }
+        #fill { width: 0%; height: 100%; background: var(--pink); transition: width 0.1s linear; }
+        #heart-btn { font-size: 5rem; cursor: pointer; user-select: none; transition: transform 0.1s; display: inline-block; }
+        #heart-btn:active { transform: scale(1.2); }
+
+        /* Level 4: Catching Game */
         #game-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #ff80ab; display: none; flex-direction: column; align-items: center;
-            z-index: 1000;
+            background: #ff80ab; display: none; flex-direction: column; align-items: center; z-index: 1000;
         }
         #bucket { position: absolute; bottom: 50px; font-size: 5rem; pointer-events: none; }
         .kiss { position: absolute; font-size: 2.5rem; }
 
-        .couple-img {
-            width: 100%; max-height: 350px; object-fit: cover; 
-            border-radius: 15px; border: 4px solid var(--pink); margin-bottom: 15px;
-        }
+        /* Buttons & Images */
+        button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: none; background: var(--pink); color: white; font-weight: bold; cursor: pointer; }
+        .btn-opt { background: #fce4ec; color: #d81b60; border: 1px solid #f8bbd0; margin-bottom: 5px; }
+        .couple-img { width: 100%; max-height: 350px; object-fit: cover; border-radius: 15px; border: 4px solid var(--pink); margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -65,7 +59,7 @@
 
     <div id="lvl1" class="card hidden">
         <h1>Challenge 1: The Path</h1>
-        <p>Guide 🏃‍♀️ through the white path! If you touch the pink background, you'll <strong>restart from the beginning</strong>.</p>
+        <p>Stay on the white! Touching the pink resets the runner.</p>
         <div id="maze-area">
             <div class="path" style="top:0; left:0; width:60px; height:100px;"></div>
             <div class="path" style="top:60px; left:0; width:250px; height:40px;"></div>
@@ -73,7 +67,6 @@
             <div class="path" style="top:170px; left:50px; width:200px; height:40px;"></div>
             <div class="path" style="top:170px; left:50px; width:40px; height:130px;"></div>
             <div class="path" style="top:260px; left:50px; width:250px; height:40px;"></div>
-            
             <div id="player">🏃‍♀️</div>
             <div id="goal">🙋‍♂️</div>
         </div>
@@ -85,9 +78,16 @@
         <div id="qOpts"></div>
     </div>
 
+    <div id="lvl3" class="card hidden">
+        <h1>Challenge 3: Love Meter</h1>
+        <p>Click the heart fast! Don't let the love drop!</p>
+        <div id="heart-btn" onclick="tapHeart()">❤️</div>
+        <div class="bar-container"><div id="fill"></div></div>
+    </div>
+
     <div id="game-screen">
-        <h1 style="color:white; margin-top: 50px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
-            Catch 10 kisses from Siddharth!<br>Score: <span id="score">0</span>
+        <h1 style="color:white; margin-top: 50px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); text-align: center;">
+            Catch 5 kisses from Siddharth!<br>Score: <span id="score">0</span>
         </h1>
         <div id="bucket">🧺</div>
     </div>
@@ -95,55 +95,46 @@
     <div id="lvl5" class="card hidden">
         <img src="our-photo.jpeg" alt="Siddharth and Poorvi" class="couple-img">
         <h2 style="color:var(--pink); margin: 0;">It's a Date!</h2>
-        <p style="font-weight:bold; color:#d32f2f; font-size: 1.2rem; margin-top: 15px;">
+        <p style="font-weight:bold; color:#d32f2f; font-size: 1.1rem; margin-top: 10px; line-height: 1.4;">
             Looks like Poorvi loves Siddharth a lot 💋😘❤️
+        </p>
+        <p style="color:#555; font-style: italic; font-size: 0.95rem;">
+            Siddharth is very happy to have Poorvi ❤️
         </p>
     </div>
 
     <script>
+        let luv = 0;
+        let luvInterval;
+
         function go(n) {
             document.querySelectorAll('.card, #game-screen').forEach(el => el.style.display = 'none');
             const target = (n === 4) ? document.getElementById('game-screen') : document.getElementById('lvl' + n);
             if (n === 4) target.style.display = 'flex'; else target.style.display = 'block';
+            
             if(n === 2) loadQ();
+            if(n === 3) startLuvDrain();
             if(n === 4) initCatch();
         }
 
-        // MAZE LOGIC WITH RESTART
+        // MAZE
         const player = document.getElementById('player');
         const maze = document.getElementById('maze-area');
-
-        function resetPlayer() {
-            player.style.left = "10px";
-            player.style.top = "10px";
-        }
-
         maze.onmousemove = (e) => {
             if (document.getElementById('lvl1').style.display === 'none') return;
-            
             const rect = maze.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-
-            // Check what is under the cursor
             const hoverEl = document.elementFromPoint(e.clientX, e.clientY);
-            
-            // If the cursor is NOT over a white path segment, RESTART
             if (hoverEl && !hoverEl.classList.contains('path')) {
-                resetPlayer();
+                player.style.left = "10px"; player.style.top = "10px";
             } else {
-                // Keep the runner centered on the cursor
-                player.style.left = (x - 12) + "px";
-                player.style.top = (y - 12) + "px";
-                
-                // Check for Win condition (Bottom Right)
-                if (x > 260 && y > 260) {
-                    go(2);
-                }
+                player.style.left = (x - 12) + "px"; player.style.top = (y - 12) + "px";
+                if (x > 260 && y > 260) go(2);
             }
         };
 
-        // QUIZ LOGIC
+        // QUIZ
         let step = 0;
         const qs = [
             { q: "Poorvi, where did we meet first?", o: ["Park", "Hospital", "School"], a: "Hospital" },
@@ -162,34 +153,54 @@
                 b.innerText = opt; b.className = 'btn-opt';
                 b.onclick = () => { 
                     if(!data.a || opt === data.a) {
-                        step++; 
-                        if(step < qs.length) loadQ(); else go(4); 
+                        step++; if(step < qs.length) loadQ(); else go(3); 
                     } else { alert("Try again! ❤️"); }
                 };
                 div.appendChild(b);
             });
         }
 
-        // CATCHING GAME
+        // LOVE METER
+        function startLuvDrain() {
+            luvInterval = setInterval(() => {
+                if (luv > 0) {
+                    luv -= 1.8; // Speed of drain
+                    updateBar();
+                }
+            }, 100);
+        }
+
+        function tapHeart() {
+            luv += 12;
+            if (luv >= 100) {
+                luv = 100; updateBar();
+                clearInterval(luvInterval);
+                setTimeout(() => go(4), 300);
+            }
+            updateBar();
+        }
+
+        function updateBar() {
+            document.getElementById('fill').style.width = luv + '%';
+        }
+
+        // CATCHING (5 KISSES)
         let score = 0;
         function initCatch() {
             const b = document.getElementById('bucket');
             window.onmousemove = (e) => { 
-                b.style.left = e.clientX + 'px'; 
-                b.style.transform = 'translateX(-50%)';
+                b.style.left = e.clientX + 'px'; b.style.transform = 'translateX(-50%)';
             };
-            
             const gameInt = setInterval(() => {
-                if(score >= 10) { clearInterval(gameInt); go(5); return; }
+                if(score >= 5) { clearInterval(gameInt); go(5); return; }
                 const k = document.createElement('div');
                 k.className = 'kiss'; k.innerHTML = '💋';
-                k.style.left = Math.random() * window.innerWidth + 'px';
+                k.style.left = Math.random() * (window.innerWidth - 40) + 'px';
                 k.style.top = '-50px';
                 document.getElementById('game-screen').appendChild(k);
-                
                 let y = -50;
                 const fall = setInterval(() => {
-                    y += 5; k.style.top = y + 'px';
+                    y += 6; k.style.top = y + 'px';
                     const br = b.getBoundingClientRect(), kr = k.getBoundingClientRect();
                     if(kr.bottom >= br.top && kr.right >= br.left && kr.left <= br.right) {
                         score++; document.getElementById('score').innerText = score;
@@ -197,7 +208,7 @@
                     }
                     if(y > window.innerHeight) { clearInterval(fall); k.remove(); }
                 }, 20);
-            }, 1000);
+            }, 900);
         }
     </script>
 </body>
