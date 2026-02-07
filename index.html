@@ -9,56 +9,64 @@
             margin: 0; background: var(--bg); 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            overflow-x: hidden;
         }
         .card { 
             background: white; padding: 30px; border-radius: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 400px; text-align: center;
         }
         .hidden { display: none; }
-        h1 { color: #d32f2f; }
+        h1 { color: #d32f2f; margin-bottom: 10px; }
+        p { color: #555; line-height: 1.5; }
         
         /* The Maze Path */
         #maze-area { 
             position: relative; width: 300px; height: 300px; background: var(--pink); 
             margin: 20px auto; border-radius: 10px; overflow: hidden;
+            cursor: crosshair;
         }
-        .path { position: absolute; background: white; }
+        .path { position: absolute; background: white; z-index: 1; }
         #player { 
             position: absolute; top: 10px; left: 10px; font-size: 25px; 
-            cursor: pointer; z-index: 10; transition: transform 0.1s;
+            z-index: 10; pointer-events: none;
         }
-        #goal { position: absolute; bottom: 10px; right: 10px; font-size: 30px; }
+        #goal { position: absolute; bottom: 10px; right: 10px; font-size: 30px; z-index: 2; }
 
-        /* Buttons & UI */
+        /* UI Elements */
         button { 
             width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; 
             border: none; background: var(--pink); color: white; 
             font-weight: bold; cursor: pointer; font-size: 1rem;
         }
-        button:hover { opacity: 0.9; }
         .btn-opt { background: #fce4ec; color: #d81b60; border: 1px solid #f8bbd0; }
         
-        /* Game Area */
+        /* Catch Game */
         #game-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #ff80ab; display: none; flex-direction: column; align-items: center;
+            z-index: 1000;
         }
-        #bucket { position: absolute; bottom: 50px; font-size: 5rem; transition: left 0.1s; }
+        #bucket { position: absolute; bottom: 50px; font-size: 5rem; pointer-events: none; }
         .kiss { position: absolute; font-size: 2.5rem; }
+
+        .couple-img {
+            width: 100%; max-height: 350px; object-fit: cover; 
+            border-radius: 15px; border: 4px solid var(--pink); margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
 
     <div id="lvl0" class="card">
         <h1>Hi Poorvi! ❤️</h1>
-        <p>Siddharth has a little quest for you. Reach the end to see the surprise!</p>
-        <button onclick="go(1)">Start Game</button>
+        <p>Siddharth has a special quest for you. Reach the end to see the surprise!</p>
+        <button onclick="go(1)">Start Quest</button>
     </div>
 
     <div id="lvl1" class="card hidden">
         <h1>Challenge 1: The Path</h1>
-        <p>Drag the runner 🏃‍♀️ along the white path to reach Siddharth! If you touch the pink, you restart.</p>
-        <div id="maze-area" onmouseleave="resetPlayer()">
+        <p>Guide 🏃‍♀️ through the white path! If you touch the pink background, you'll <strong>restart from the beginning</strong>.</p>
+        <div id="maze-area">
             <div class="path" style="top:0; left:0; width:60px; height:100px;"></div>
             <div class="path" style="top:60px; left:0; width:250px; height:40px;"></div>
             <div class="path" style="top:60px; left:210px; width:40px; height:150px;"></div>
@@ -66,26 +74,30 @@
             <div class="path" style="top:170px; left:50px; width:40px; height:130px;"></div>
             <div class="path" style="top:260px; left:50px; width:250px; height:40px;"></div>
             
-            <div id="player" draggable="true">🏃‍♀️</div>
+            <div id="player">🏃‍♀️</div>
             <div id="goal">🙋‍♂️</div>
         </div>
     </div>
 
     <div id="lvl2" class="card hidden">
         <h1>Challenge 2: Memory</h1>
-        <p id="qText" style="font-weight:bold;"></p>
+        <p id="qText" style="font-weight:bold; padding: 10px;"></p>
         <div id="qOpts"></div>
     </div>
 
     <div id="game-screen">
-        <h1 style="color:white;">Catch 10 Kisses! Score: <span id="score">0</span></h1>
+        <h1 style="color:white; margin-top: 50px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
+            Catch 10 kisses from Siddharth!<br>Score: <span id="score">0</span>
+        </h1>
         <div id="bucket">🧺</div>
     </div>
 
     <div id="lvl5" class="card hidden">
-        <img src="our-photo.jpeg" alt="Us" style="width:100%; border-radius:15px;">
-        <h2 style="color:var(--pink);">It's a Date!</h2>
-        <p>Looks like you love me a lot!<br>— Siddharth</p>
+        <img src="our-photo.jpeg" alt="Siddharth and Poorvi" class="couple-img">
+        <h2 style="color:var(--pink); margin: 0;">It's a Date!</h2>
+        <p style="font-weight:bold; color:#d32f2f; font-size: 1.2rem; margin-top: 15px;">
+            Looks like Poorvi loves Siddharth a lot 💋😘❤️
+        </p>
     </div>
 
     <script>
@@ -93,12 +105,11 @@
             document.querySelectorAll('.card, #game-screen').forEach(el => el.style.display = 'none');
             const target = (n === 4) ? document.getElementById('game-screen') : document.getElementById('lvl' + n);
             if (n === 4) target.style.display = 'flex'; else target.style.display = 'block';
-            
             if(n === 2) loadQ();
             if(n === 4) initCatch();
         }
 
-        // MAZE LOGIC
+        // MAZE LOGIC WITH RESTART
         const player = document.getElementById('player');
         const maze = document.getElementById('maze-area');
 
@@ -108,28 +119,37 @@
         }
 
         maze.onmousemove = (e) => {
+            if (document.getElementById('lvl1').style.display === 'none') return;
+            
             const rect = maze.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            // Simple collision: check if the element under mouse is the 'path'
+            // Check what is under the cursor
             const hoverEl = document.elementFromPoint(e.clientX, e.clientY);
-            if (hoverEl && !hoverEl.classList.contains('path') && hoverEl.id !== 'player') {
+            
+            // If the cursor is NOT over a white path segment, RESTART
+            if (hoverEl && !hoverEl.classList.contains('path')) {
                 resetPlayer();
             } else {
+                // Keep the runner centered on the cursor
                 player.style.left = (x - 12) + "px";
                 player.style.top = (y - 12) + "px";
-                if (x > 260 && y > 260) go(2);
+                
+                // Check for Win condition (Bottom Right)
+                if (x > 260 && y > 260) {
+                    go(2);
+                }
             }
         };
 
         // QUIZ LOGIC
         let step = 0;
         const qs = [
-            { q: "Where did we meet first?", o: ["Park", "Hospital", "School"], a: "Hospital" },
-            { q: "First gift from Siddharth?", o: ["Octopus 🐙", "Teddy"], a: "Octopus 🐙" },
-            { q: "What do you like about him?", o: ["Kind", "Caring", "All of the above"], a: "All of the above" },
-            { q: "How much do you love him?", o: ["A lot!", "Infinity + 1", "To the moon & back"], a: null }
+            { q: "Poorvi, where did we meet first?", o: ["Park", "Hospital", "School"], a: "Hospital" },
+            { q: "What was the first gift Siddharth gave you?", o: ["Teddy Bear", "Octopus 🐙", "Chocolates", "Flowers"], a: "Octopus 🐙" },
+            { q: "What do you like about Siddharth?", o: ["Intelligent", "Caring", "Kind", "All of the above"], a: "All of the above" },
+            { q: "How much do you love him?", o: ["A lot!", "Infinity + 1", "Unconditionally", "To the moon & back", "More than he loves me"], a: null }
         ];
 
         function loadQ() {
@@ -140,7 +160,12 @@
             data.o.forEach(opt => {
                 const b = document.createElement('button');
                 b.innerText = opt; b.className = 'btn-opt';
-                b.onclick = () => { step++; if(step < qs.length) loadQ(); else go(4); };
+                b.onclick = () => { 
+                    if(!data.a || opt === data.a) {
+                        step++; 
+                        if(step < qs.length) loadQ(); else go(4); 
+                    } else { alert("Try again! ❤️"); }
+                };
                 div.appendChild(b);
             });
         }
@@ -149,7 +174,10 @@
         let score = 0;
         function initCatch() {
             const b = document.getElementById('bucket');
-            window.onmousemove = (e) => { b.style.left = e.clientX + 'px'; };
+            window.onmousemove = (e) => { 
+                b.style.left = e.clientX + 'px'; 
+                b.style.transform = 'translateX(-50%)';
+            };
             
             const gameInt = setInterval(() => {
                 if(score >= 10) { clearInterval(gameInt); go(5); return; }
