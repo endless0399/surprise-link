@@ -2,9 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Valentine's Challenge</title>
     <style>
+        :root {
+            --primary-pink: #ff4081;
+            --soft-pink: #ffebee;
+            --text-red: #d32f2f;
+        }
+
         body {
             display: flex;
             flex-direction: column;
@@ -12,72 +18,81 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #ffebee;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--soft-pink);
+            font-family: -apple-system, system-ui, sans-serif;
             text-align: center;
-            overflow: hidden; /* Prevents scrollbars when button moves */
+            overflow: hidden;
+            touch-action: manipulation;
         }
 
         .card {
             background: white;
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 450px;
-            width: 90%;
+            padding: 2rem 1.5rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 85%;
+            max-width: 350px;
             z-index: 10;
         }
 
         .hidden { display: none !important; }
-        
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-        }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; }
 
         button {
-            padding: 12px 25px;
+            padding: 16px;
             font-size: 1.1rem;
+            font-weight: 600;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .choice-btn {
-            background-color: #fce4ec;
-            color: #d81b60;
-            border: 2px solid #f8bbd0;
+        .choice-btn { background-color: #fce4ec; color: #d81b60; border: 2px solid #f8bbd0; }
+        #yesBtn { background-color: var(--primary-pink); color: white; width: 100%; margin-bottom: 10px; }
+        #noBtn { background-color: #e0e0e0; color: #757575; position: absolute; width: 80px; z-index: 100; }
+
+        /* Game Styles */
+        #game-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(#ffc1e3, #ff80ab);
+            display: none;
+            z-index: 20;
         }
 
-        .choice-btn:hover {
-            background-color: #f8bbd0;
+        .kiss {
+            position: absolute;
+            font-size: 2rem;
+            cursor: pointer;
+            user-select: none;
+            animation: fall linear forwards;
         }
 
-        #yesBtn { background-color: #ff4081; color: white; width: 120px; }
-        
-        #noBtn { 
-            background-color: #9e9e9e; 
-            color: white; 
-            position: absolute; 
-            width: 100px; 
-            transition: 0.1s ease-out;
+        @keyframes fall {
+            to { transform: translateY(110vh); }
         }
 
-        h1 { color: #d32f2f; margin-bottom: 10px; }
-        p { color: #555; }
+        #score-board {
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
     <div id="section1" class="card">
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp4ZzRndnFvNm9pbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpNUMo/giphy.gif" width="150">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp4ZzRndnFvNm9pbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpNUMo/giphy.gif" width="120">
         <h1>Will you be my Valentine?</h1>
-        <div style="height: 120px; position: relative; margin-top: 20px;">
+        <div style="height: 140px; position: relative; width: 100%; margin-top: 20px;">
             <button id="yesBtn" onclick="showQuiz()">Yes!</button>
-            <button id="noBtn" onmouseover="moveButton()">No</button>
+            <button id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()">No</button>
         </div>
     </div>
 
@@ -87,50 +102,33 @@
         <div class="btn-group" id="options"></div>
     </div>
 
-    <div id="section3" class="hidden">
-        <h1 style="font-size: 3.5rem; color: #d32f2f;">It's a Date! ❤️</h1>
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnJueHdzbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/5GoVLqeAOo6PK/giphy.gif">
-        <p style="font-size: 1.5rem;">I knew you'd remember the Hospital!</p>
+    <div id="game-container">
+        <div id="score-board">Catch 10 Kisses: <span id="score">0</span></div>
+    </div>
+
+    <div id="section4" class="card hidden">
+        <h1>Victory! ❤️</h1>
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnJueHdzbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/5GoVLqeAOo6PK/giphy.gif" width="150">
+        <p>You caught all my love! See you on Valentine's Day!</p>
     </div>
 
     <script>
         let currentStep = 0;
-        let noCount = 0;
+        let score = 0;
+        const targetScore = 10;
         
         const questions = [
-            {
-                q: "Where did we meet first?",
-                options: ["The Park", "Hospital", "Coffee Shop", "School"],
-                correct: "Hospital"
-            },
-            {
-                q: "What is my absolute favorite food?",
-                options: ["Pizza 🍕", "Sushi 🍣", "Your Cooking 🍳", "Tacos 🌮"],
-                correct: "Your Cooking 🍳"
-            },
-            {
-                q: "How much do you love me?",
-                options: ["A lot!", "To the moon and back", "More than coffee", "Infinity + 1"],
-                correct: null 
-            }
+            { q: "Where did we meet first?", options: ["The Park", "Hospital", "Coffee Shop", "School"], correct: "Hospital" },
+            { q: "What is my absolute favorite food?", options: ["Pizza 🍕", "Sushi 🍣", "Your Cooking 🍳", "Tacos 🌮"], correct: "Your Cooking 🍳" },
+            { q: "How much do you love me?", options: ["A lot!", "To the moon and back", "More than coffee", "Infinity + 1"], correct: null }
         ];
 
         function moveButton() {
             const btn = document.getElementById('noBtn');
-            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
-            
-            btn.style.left = x + 'px';
-            btn.style.top = y + 'px';
-            
-            // Subtle "forcing" effect: make the Yes button bigger and No button smaller
-            noCount++;
-            if(noCount < 10) {
-                const yesBtn = document.getElementById('yesBtn');
-                let currentSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
-                yesBtn.style.fontSize = (currentSize + 2) + 'px';
-                yesBtn.style.padding = (12 + noCount) + 'px ' + (25 + noCount*2) + 'px';
-            }
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 20);
+            btn.style.left = Math.max(10, x) + 'px';
+            btn.style.top = Math.max(10, y) + 'px';
         }
 
         function showQuiz() {
@@ -143,10 +141,8 @@
             if (currentStep < questions.length) {
                 document.getElementById('quizTitle').innerText = `Question ${currentStep + 1}`;
                 document.getElementById('questionText').innerText = questions[currentStep].q;
-                
                 const optionsDiv = document.getElementById('options');
                 optionsDiv.innerHTML = ''; 
-                
                 questions[currentStep].options.forEach(opt => {
                     const btn = document.createElement('button');
                     btn.innerText = opt;
@@ -155,23 +151,56 @@
                     optionsDiv.appendChild(btn);
                 });
             } else {
-                showSuccess();
+                startMiniGame();
             }
         }
 
         function checkAnswer(selected) {
-            const correctAnswer = questions[currentStep].correct;
-            if (correctAnswer && selected !== correctAnswer) {
-                alert("Incorrect! ❌ Try again!");
+            if (questions[currentStep].correct && selected !== questions[currentStep].correct) {
+                alert("Wrong! Try again! ❤️");
             } else {
                 currentStep++;
                 loadQuestion();
             }
         }
 
-        function showSuccess() {
+        function startMiniGame() {
             document.getElementById('section2').classList.add('hidden');
-            document.getElementById('section3').classList.remove('hidden');
+            document.getElementById('game-container').style.display = 'block';
+            gameLoop();
+        }
+
+        function gameLoop() {
+            if (score < targetScore) {
+                createKiss();
+                setTimeout(gameLoop, 800);
+            }
+        }
+
+        function createKiss() {
+            const kiss = document.createElement('div');
+            kiss.innerHTML = '💋';
+            kiss.className = 'kiss';
+            kiss.style.left = Math.random() * 90 + 'vw';
+            kiss.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            
+            // Catching the kiss
+            kiss.onclick = kiss.ontouchstart = () => {
+                score++;
+                document.getElementById('score').innerText = score;
+                kiss.remove();
+                if (score >= targetScore) showFinal();
+            };
+            
+            document.getElementById('game-container').appendChild(kiss);
+            
+            // Remove if not caught
+            setTimeout(() => { if(kiss) kiss.remove(); }, 4000);
+        }
+
+        function showFinal() {
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('section4').classList.remove('hidden');
             document.body.style.backgroundColor = "#ffc1e3";
         }
     </script>
