@@ -3,98 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Be My Valentine?</title>
+    <title>Valentine's Challenge</title>
     <style>
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             background-color: #ffebee;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-
-        h1 {
-            color: #d32f2f;
-            font-size: 3rem;
             text-align: center;
+            overflow: hidden; /* Prevents scrollbars when button moves */
         }
 
-        .container {
-            position: relative;
-            text-align: center;
+        .card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 450px;
+            width: 90%;
+            z-index: 10;
         }
 
-        .buttons {
+        .hidden { display: none !important; }
+        
+        .btn-group {
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
+            padding: 12px 25px;
+            font-size: 1.1rem;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
 
-        #yesBtn {
-            background-color: #ff4081;
-            color: white;
+        .choice-btn {
+            background-color: #fce4ec;
+            color: #d81b60;
+            border: 2px solid #f8bbd0;
         }
 
-        #noBtn {
-            background-color: #9e9e9e;
-            color: white;
-            position: absolute;
+        .choice-btn:hover {
+            background-color: #f8bbd0;
         }
 
-        .gif-container {
-            margin-bottom: 20px;
+        #yesBtn { background-color: #ff4081; color: white; width: 120px; }
+        
+        #noBtn { 
+            background-color: #9e9e9e; 
+            color: white; 
+            position: absolute; 
+            width: 100px; 
+            transition: 0.1s ease-out;
         }
+
+        h1 { color: #d32f2f; margin-bottom: 10px; }
+        p { color: #555; }
     </style>
 </head>
 <body>
 
-    <div class="gif-container">
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp4ZzRndnFvNm9pbmR4eG54eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpNUMo/giphy.gif" alt="Cute Cat" width="200">
-    </div>
-
-    <h1>Will you be my Valentine? ❤️</h1>
-
-    <div class="container">
-        <div class="buttons">
-            <button id="yesBtn" onclick="celebrate()">Yes!</button>
+    <div id="section1" class="card">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp4ZzRndnFvNm9pbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpNUMo/giphy.gif" width="150">
+        <h1>Will you be my Valentine?</h1>
+        <div style="height: 120px; position: relative; margin-top: 20px;">
+            <button id="yesBtn" onclick="showQuiz()">Yes!</button>
             <button id="noBtn" onmouseover="moveButton()">No</button>
         </div>
     </div>
 
+    <div id="section2" class="card hidden">
+        <h1 id="quizTitle">Question 1</h1>
+        <p id="questionText"></p>
+        <div class="btn-group" id="options"></div>
+    </div>
+
+    <div id="section3" class="hidden">
+        <h1 style="font-size: 3.5rem; color: #d32f2f;">It's a Date! ❤️</h1>
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnJueHdzbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/5GoVLqeAOo6PK/giphy.gif">
+        <p style="font-size: 1.5rem;">I knew you'd remember the Hospital!</p>
+    </div>
+
     <script>
+        let currentStep = 0;
+        let noCount = 0;
+        
+        const questions = [
+            {
+                q: "Where did we meet first?",
+                options: ["The Park", "Hospital", "Coffee Shop", "School"],
+                correct: "Hospital"
+            },
+            {
+                q: "What is my absolute favorite food?",
+                options: ["Pizza 🍕", "Sushi 🍣", "Your Cooking 🍳", "Tacos 🌮"],
+                correct: "Your Cooking 🍳"
+            },
+            {
+                q: "How much do you love me?",
+                options: ["A lot!", "To the moon and back", "More than coffee", "Infinity + 1"],
+                correct: null 
+            }
+        ];
+
         function moveButton() {
             const btn = document.getElementById('noBtn');
-            
-            // Calculate random positions within the viewport
-            // Subtracting button dimensions to keep it on screen
             const x = Math.random() * (window.innerWidth - btn.offsetWidth);
             const y = Math.random() * (window.innerHeight - btn.offsetHeight);
-
+            
             btn.style.left = x + 'px';
             btn.style.top = y + 'px';
+            
+            // Subtle "forcing" effect: make the Yes button bigger and No button smaller
+            noCount++;
+            if(noCount < 10) {
+                const yesBtn = document.getElementById('yesBtn');
+                let currentSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
+                yesBtn.style.fontSize = (currentSize + 2) + 'px';
+                yesBtn.style.padding = (12 + noCount) + 'px ' + (25 + noCount*2) + 'px';
+            }
         }
 
-        function celebrate() {
-            document.body.innerHTML = `
-                <div style="text-align:center;">
-                    <h1 style="font-size: 4rem;">Yay! See you on the 14th! 🌹</h1>
-                    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnJueHdzbmR4eG54eG54eG54eG54eG54eG54eG54JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/5GoVLqeAOo6PK/giphy.gif" alt="Success">
-                </div>
-            `;
+        function showQuiz() {
+            document.getElementById('section1').classList.add('hidden');
+            document.getElementById('section2').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentStep < questions.length) {
+                document.getElementById('quizTitle').innerText = `Question ${currentStep + 1}`;
+                document.getElementById('questionText').innerText = questions[currentStep].q;
+                
+                const optionsDiv = document.getElementById('options');
+                optionsDiv.innerHTML = ''; 
+                
+                questions[currentStep].options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.innerText = opt;
+                    btn.className = 'choice-btn';
+                    btn.onclick = () => checkAnswer(opt);
+                    optionsDiv.appendChild(btn);
+                });
+            } else {
+                showSuccess();
+            }
+        }
+
+        function checkAnswer(selected) {
+            const correctAnswer = questions[currentStep].correct;
+            if (correctAnswer && selected !== correctAnswer) {
+                alert("Incorrect! ❌ Try again!");
+            } else {
+                currentStep++;
+                loadQuestion();
+            }
+        }
+
+        function showSuccess() {
+            document.getElementById('section2').classList.add('hidden');
+            document.getElementById('section3').classList.remove('hidden');
             document.body.style.backgroundColor = "#ffc1e3";
         }
     </script>
