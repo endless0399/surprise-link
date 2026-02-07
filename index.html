@@ -4,54 +4,59 @@
     <meta charset="UTF-8">
     <title>For Poorvi ❤️</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --pink: #ff4081; --bg: #ffebee; }
-        
-        /* touch-action: manipulation prevents the double-tap zoom delay */
-        * { 
-            touch-action: manipulation; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-
+        * { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { 
             margin: 0; background: var(--bg); 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             overflow: hidden; 
         }
-
         .card { 
             background: white; padding: 25px; border-radius: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 320px; text-align: center;
             z-index: 10;
         }
-
         .hidden { display: none; }
         h1 { color: #d32f2f; margin-bottom: 10px; font-size: 1.4rem; }
         
-        /* Level 1: Tap Maze */
+        /* Maze */
         #maze-area { position: relative; width: 300px; height: 150px; background: var(--pink); margin: 20px auto; border-radius: 15px; overflow: hidden; }
         .path { position: absolute; background: white; top: 40px; left: 0; width: 300px; height: 70px; z-index: 1; }
-        #player { position: absolute; top: 60px; left: 10px; font-size: 30px; z-index: 10; transition: all 0.2s ease; }
+        #player-container { position: absolute; top: 45px; left: 10px; z-index: 10; display: flex; flex-direction: column; align-items: center; transition: all 0.2s ease; }
+        #player-label { font-size: 10px; font-weight: bold; color: var(--pink); margin-bottom: -5px; }
+        #player-icon { font-size: 25px; }
         #goal { position: absolute; top: 55px; right: 10px; font-size: 35px; z-index: 2; }
 
         /* Level 3: Love Meter */
+        #love-prompt { font-weight: bold; color: #d81b60; margin-bottom: 5px; font-size: 1.1rem; }
         .bar-container { width: 100%; height: 25px; background: #eee; border-radius: 15px; margin: 20px 0; overflow: hidden; border: 2px solid #f8bbd0; }
         #fill { width: 0%; height: 100%; background: var(--pink); transition: width 0.1s linear; }
-        #heart-btn { font-size: 4.5rem; cursor: pointer; user-select: none; display: inline-block; }
+        #heart-btn { font-size: 4.5rem; cursor: pointer; user-select: none; display: inline-block; transition: transform 0.1s ease; }
+        #heart-btn:active { transform: scale(1.2); }
 
         /* Catch Game */
         #game-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ff80ab; display: none; flex-direction: column; align-items: center; z-index: 1000; }
         #bucket { position: absolute; bottom: 50px; font-size: 5rem; transition: left 0.15s ease-out; }
         .kiss { position: absolute; font-size: 2.5rem; }
 
-        /* Scratch Card */
+        /* Final Page & Spoiler */
         #scratch-container { position: relative; width: 280px; height: 280px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: 4px solid var(--pink); }
         #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 20; touch-action: none; }
         .couple-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
+        
+        #spoiler-box {
+            background: #333; color: white; padding: 10px; margin-top: 15px;
+            border-radius: 10px; cursor: pointer; font-weight: bold;
+            transition: all 0.3s;
+        }
+        .revealed { background: transparent !important; color: #d32f2f !important; font-size: 1.3rem !important; }
 
         button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: none; background: var(--pink); color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
         .btn-opt { background: #fce4ec; color: #d81b60; border: 1px solid #f8bbd0; margin-bottom: 8px; font-size: 0.9rem; }
+        #yes-btn { background: #4caf50; display: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -64,10 +69,13 @@
 
     <div id="lvl1" class="card hidden">
         <h1>Challenge 1: The Path</h1>
-        <p>Tap the white path to move 🏃‍♀️ to Siddharth!</p>
+        <p>Tap the white path to move Poorvi to Siddharth!</p>
         <div id="maze-area" onclick="handleMazeTap(event)">
             <div class="path"></div>
-            <div id="player">🏃‍♀️</div>
+            <div id="player-container">
+                <span id="player-label">Poorvi</span>
+                <span id="player-icon">🏃‍♀️</span>
+            </div>
             <div id="goal">🙋‍♂️</div>
         </div>
     </div>
@@ -80,7 +88,7 @@
 
     <div id="lvl3" class="card hidden">
         <h1>Challenge 3: Love Meter</h1>
-        <p>Tap ❤️ fast! Don't let it drop!</p>
+        <p id="love-prompt">Fill your love for Siddharth</p>
         <div id="heart-btn" onclick="tapHeart()">❤️</div>
         <div class="bar-container"><div id="fill"></div></div>
     </div>
@@ -93,32 +101,46 @@
     </div>
 
     <div id="lvl5" class="card hidden">
-        <h2 style="color:var(--pink); margin-bottom: 10px;">Happy Valentine's Week! 🌹✨</h2>
+        <h2 style="color:var(--pink); margin-bottom: 10px;">Happy Propose Day! 💍✨</h2>
         <div id="scratch-container">
             <img src="our-photo.jpeg" class="couple-img">
             <canvas id="scratch-canvas" width="280" height="280"></canvas>
         </div>
-        <p style="font-weight:bold; color:#d32f2f; margin-top: 15px; font-size: 1.1rem;">
-            Looks like Poorvi loves Siddharth a lot 💋😘❤️
-        </p>
-        <p style="color:#555; font-style: italic; font-size: 0.9rem;">
-            Siddharth is very happy to have Poorvi ❤️🥳
+        
+        <div id="spoiler-box" onclick="revealQuestion(this)">
+            Click to see a secret message...
+        </div>
+
+        <button id="yes-btn" onclick="celebrate()">Yes, I will! ❤️</button>
+        
+        <p style="font-weight:bold; color:#d32f2f; margin-top: 15px; font-size: 1rem;">
+            Poorvi ❤️ Siddharth
         </p>
     </div>
 
     <script>
-        // Disable Double-Tap Zoom for iOS
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            let now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
+        let lastTouchEnd = 0, luv = 0, luvInterval, step = 0, score = 0;
 
-        let luv = 0, luvInterval, step = 0, score = 0;
+        // Reveal the spoiler and show the YES button
+        function revealQuestion(el) {
+            el.innerText = "Will you be my Valentine? 🌹";
+            el.classList.add('revealed');
+            document.getElementById('yes-btn').style.display = 'block';
+        }
 
+        // Celebrate with heart confetti
+        function celebrate() {
+            const duration = 5 * 1000;
+            const end = Date.now() + duration;
+            (function frame() {
+              confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4081', '#d32f2f'] });
+              confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4081', '#d32f2f'] });
+              if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+            alert("Siddharth is the luckiest guy! Happy Propose Day Poorvi! ❤️");
+        }
+
+        // Logic Functions
         function go(n) {
             document.querySelectorAll('.card, #game-screen').forEach(el => el.style.display = 'none');
             const target = (n === 4) ? document.getElementById('game-screen') : document.getElementById('lvl' + n);
@@ -131,15 +153,10 @@
 
         function handleMazeTap(e) {
             const rect = document.getElementById('maze-area').getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const player = document.getElementById('player');
-            if (y < 40 || y > 110) {
-                player.style.left = "10px";
-            } else {
-                player.style.left = (x - 15) + "px";
-                if (x > 260) go(2);
-            }
+            const x = e.clientX - rect.left, y = e.clientY - rect.top;
+            const player = document.getElementById('player-container');
+            if (y < 40 || y > 110) { player.style.left = "10px"; } 
+            else { player.style.left = (x - 25) + "px"; if (x > 260) go(2); }
         }
 
         const qs = [
@@ -159,15 +176,13 @@
             });
         }
 
-        function startLuvDrain() { luvInterval = setInterval(() => { if (luv > 0) { luv -= 1.8; updateBar(); } }, 100); }
+        function startLuvDrain() { luvInterval = setInterval(() => { if (luv > 0) { luv -= 0.8; updateBar(); } }, 100); }
         function tapHeart() { luv += 12; if (luv >= 100) { luv = 100; updateBar(); clearInterval(luvInterval); setTimeout(() => go(4), 300); } updateBar(); }
         function updateBar() { document.getElementById('fill').style.width = luv + '%'; }
 
         function moveBucket(e) {
-            const bucket = document.getElementById('bucket');
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            bucket.style.left = x + 'px';
-            bucket.style.transform = 'translateX(-50%)';
+            const bucket = document.getElementById('bucket'), x = e.clientX || (e.touches && e.touches[0].clientX);
+            bucket.style.left = x + 'px'; bucket.style.transform = 'translateX(-50%)';
         }
 
         function initCatch() {
@@ -187,7 +202,7 @@
         }
 
         function initScratch() {
-            const canvas = document.getElementById('scratch-canvas'); const ctx = canvas.getContext('2d');
+            const canvas = document.getElementById('scratch-canvas'), ctx = canvas.getContext('2d');
             ctx.fillStyle = '#C0C0C0'; ctx.fillRect(0, 0, 280, 280);
             ctx.fillStyle = '#666'; ctx.font = '16px Arial'; ctx.textAlign = 'center'; ctx.fillText('Tap & rub to reveal ❤️', 140, 140);
             let isDrawing = false;
@@ -203,6 +218,12 @@
             canvas.addEventListener('touchstart', (e) => { isDrawing = true; }); canvas.addEventListener('touchend', () => isDrawing = false);
             canvas.addEventListener('touchmove', (e) => scratch(e));
         }
+
+        document.addEventListener('touchend', (e) => {
+            let now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
